@@ -7,6 +7,7 @@ export interface IBaseRepository<T> {
 }
 
 export abstract class BaseRepository<T> implements IBaseRepository<T> {
+  // eslint-disable-next-line
   protected abstract model: any;
 
   async create(data: T): Promise<T> {

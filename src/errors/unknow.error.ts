@@ -3,9 +3,9 @@ export class UnknownError extends Error {
     super(
       error instanceof Error
         ? error.message
-        : typeof error === "string"
-        ? error
-        : "Erro desconhecido no servidor!"
+        : typeof error === 'string'
+          ? error
+          : 'Erro desconhecido no servidor!',
     );
     this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);

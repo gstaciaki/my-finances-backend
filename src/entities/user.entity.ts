@@ -1,4 +1,4 @@
-import { BaseEntity, BaseProps } from "./_base/entity";
+import { BaseEntity, BaseProps } from './_base/entity';
 
 export interface UserProps extends BaseProps {
   name: string;
