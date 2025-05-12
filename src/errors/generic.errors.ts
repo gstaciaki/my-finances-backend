@@ -6,3 +6,9 @@ export class AlreadyExistsError extends BaseBusinessError {
     super(`Já existe um(a) ${entity}${fieldInfo}.`);
   }
 }
+
+export class NotFoundError extends BaseBusinessError {
+  constructor(entity: string, field: string = "id", value: string) {
+    super(`Não foi encontrado(a) ${entity} com ${field}: ${value}.`);
+  }
+}
