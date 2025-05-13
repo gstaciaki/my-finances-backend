@@ -49,7 +49,7 @@ jobs:
         run: yarn test
 
   code-quality:
-    name: 🧹 Run ESLint
+    name: Run ESLint
     runs-on: ubuntu-latest
 
     steps:
