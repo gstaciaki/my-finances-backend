@@ -1,16 +1,15 @@
 import { User } from '@src/entities/user.entity';
-import { BaseBusinessError } from '@src/errors/base-business.error';
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
-import { InputValidationError } from '@src/errors/input-validation.error';
-import { UnknownError } from '@src/errors/unknow.error';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { UpdateUserInput, UpdateUserOutput } from './dtos';
+import { UpdateUserInput, UpdateUserOutput, UpdateUserSchema } from './dtos';
+import { DefaultFailOutput } from '@src/types/errors';
+import { ZodSchema } from 'zod';
 
 type Input = UpdateUserInput;
 
-type FailOutput = BaseBusinessError | UnknownError;
+type FailOutput = DefaultFailOutput;
 type SuccessOutput = UpdateUserOutput;
 
 export class UpdateUserUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
@@ -18,12 +17,8 @@ export class UpdateUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validate(input: Input): Either<InputValidationError, void> {
-    if (!input.id) {
-      return wrong(new InputValidationError('ID do usuário é obrigatório.'));
-    }
-
-    return right(undefined);
+  protected validationRules(): ZodSchema<Input> {
+    return UpdateUserSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {

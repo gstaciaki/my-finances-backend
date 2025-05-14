@@ -1,15 +1,14 @@
 import { User } from '@src/entities/user.entity';
-import { BaseBusinessError } from '@src/errors/base-business.error';
 import { NotFoundError } from '@src/errors/generic.errors';
-import { InputValidationError } from '@src/errors/input-validation.error';
-import { UnknownError } from '@src/errors/unknow.error';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { DeleteUserInput, DeleteUserOutput } from './dtos';
+import { DeleteUserInput, DeleteUserOutput, DeleteUserSchema } from './dtos';
+import { ZodSchema } from 'zod';
+import { DefaultFailOutput } from '@src/types/errors';
 
 type Input = DeleteUserInput;
-type FailOutput = BaseBusinessError | UnknownError;
+type FailOutput = DefaultFailOutput;
 type SuccessOutput = DeleteUserOutput;
 
 export class DeleteUserUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
@@ -17,10 +16,8 @@ export class DeleteUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validate(input: Input): Either<InputValidationError, void> {
-    if (!input.id) return wrong(new InputValidationError('ID é obrigatório'));
-
-    return right(undefined);
+  protected validationRules(): ZodSchema<Input> {
+    return DeleteUserSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {

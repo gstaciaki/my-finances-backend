@@ -1,14 +1,14 @@
-import { User } from '@src/entities/user.entity';
+import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { AlreadyExistsError } from '@src/errors/generic.errors';
-import { InputValidationError } from '@src/errors/input-validation.error';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { DefaultFailOutput } from '@src/types/errors';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { CreateUserInput, CreateUserOutput } from './dtos';
+import { CreateUserInput, CreateUserOutput, CreateUserSchema } from './dtos';
+import { User } from '@src/entities/user.entity';
+import { ZodSchema } from 'zod';
+import PasswordUtil from '@src/util/password';
 
 type Input = CreateUserInput;
-
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = CreateUserOutput;
 
@@ -17,18 +17,8 @@ export class CreateUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validate(input: Input): Either<InputValidationError, void> {
-    const { name, email, password, cpf } = input ?? {};
-
-    if (!name || !email || !password || !cpf) {
-      return wrong(new InputValidationError('Todos os campos são obrigatórios.'));
-    }
-
-    if (!email.includes('@')) {
-      return wrong(new InputValidationError('Email inválido.'));
-    }
-
-    return right(undefined);
+  protected validationRules(): ZodSchema<Input> {
+    return CreateUserSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
@@ -37,7 +27,8 @@ export class CreateUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
       return wrong(new AlreadyExistsError('usuário', 'email'));
     }
 
-    const user = new User(input);
+    const hashedPassword = await PasswordUtil.hashPassword(input.password);
+    const user = new User({ ...input, password: hashedPassword });
     await this.userRepo.create(user);
     return right(user);
   }

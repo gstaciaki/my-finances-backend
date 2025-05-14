@@ -1,14 +1,13 @@
 import { User } from '@src/entities/user.entity';
-import { BaseBusinessError } from '@src/errors/base-business.error';
-import { InputValidationError } from '@src/errors/input-validation.error';
-import { UnknownError } from '@src/errors/unknow.error';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right } from '@src/util/either';
-import { ListUsersInput, ListUsersOutput } from './dtos';
+import { ListUsersInput, ListUsersOutput, ListUsersSchema } from './dtos';
+import { ZodSchema } from 'zod';
+import { DefaultFailOutput } from '@src/types/errors';
 
 type Input = ListUsersInput;
-type FailOutput = BaseBusinessError | UnknownError;
+type FailOutput = DefaultFailOutput;
 type SuccessOutput = ListUsersOutput;
 
 export class ListUsersUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
@@ -16,8 +15,8 @@ export class ListUsersUseCase extends AbstractUseCase<Input, FailOutput, Success
     super();
   }
 
-  protected validate(): Either<InputValidationError, void> {
-    return right(undefined);
+  protected validationRules(): ZodSchema<Input> {
+    return ListUsersSchema;
   }
 
   protected async execute(): Promise<Either<FailOutput, SuccessOutput>> {
