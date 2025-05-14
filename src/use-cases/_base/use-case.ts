@@ -1,6 +1,7 @@
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { UnknownError } from '@src/errors/unknow.error';
 import { Either, wrong } from '@src/util/either';
+import { ZodSchema } from 'zod';
 
 export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOutput> {
   constructor() {}
@@ -9,18 +10,22 @@ export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOu
     input?: Input,
   ): Promise<Either<FailOutput | InputValidationError | UnknownError, SuccessOutput>>;
 
-  protected abstract validate(input: Input): Either<InputValidationError, void>;
+  protected abstract validationRules(): ZodSchema<Input>;
 
   public async run(
     input: Input,
   ): Promise<Either<FailOutput | InputValidationError | UnknownError, SuccessOutput>> {
     try {
-      const validation = this.validate(input);
-      if (validation.isWrong()) {
-        return wrong(validation.value);
+      const schema = this.validationRules();
+      const result = schema.safeParse(input);
+
+      if (!result.success) {
+        return wrong(new InputValidationError(result.error));
       }
-      const result = await this.execute(input);
-      return result;
+
+      const parsedInput = result.data;
+      const output = await this.execute(parsedInput);
+      return output;
     } catch (error) {
       return wrong(new UnknownError(error));
     }

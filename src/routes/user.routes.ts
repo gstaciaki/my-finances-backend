@@ -1,14 +1,14 @@
 import { makeUserController } from '@src/factories/user.factory';
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 
 const userRouter = Router();
 const userController = makeUserController();
 
 userRouter
-  .post('/user', (req, res) => userController.create(req, res))
-  .get('/user', (req, res) => userController.index(req, res))
-  .get('/user/:id', (req, res) => userController.show(req, res))
-  .put('/user/:id', (req, res) => userController.update(req, res))
-  .delete('/user/:id', (req, res) => userController.delete(req, res));
+  .post('/user', userController.create.bind(userController) as RequestHandler)
+  .get('/user', userController.index.bind(userController) as RequestHandler)
+  .get('/user/:id', userController.show.bind(userController) as RequestHandler)
+  .put('/user/:id', userController.update.bind(userController) as RequestHandler)
+  .delete('/user/:id', userController.delete.bind(userController) as RequestHandler);
 
 export { userRouter };
