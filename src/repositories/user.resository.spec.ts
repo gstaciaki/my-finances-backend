@@ -1,31 +1,21 @@
-import { randomUUID } from 'crypto';
 import { UserRepository } from './user.repository';
 import { User } from '@src/entities/user.entity';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
-import { genCpf } from 'test/helpers/faker';
+import { genUser } from 'test/prefab/user';
 
 setupDatabaseLifecycle();
 
 describe('UserRepository', () => {
   const repository = new UserRepository();
 
-  const fakeUserData = () =>
-    new User({
-      id: randomUUID(),
-      name: 'Test User',
-      email: `test-${Date.now()}@example.com`,
-      password: 'hashed-password',
-      cpf: genCpf(),
-    });
-
   it('should create a user', async () => {
-    const data = fakeUserData();
+    const data = genUser();
     const created = await repository.create(data);
     expect(new User(created)).toStrictEqual(data);
   });
 
   it('should find a user by id', async () => {
-    const data = fakeUserData();
+    const data = genUser();
     await repository.create(data);
 
     const found = await repository.findById(data.id);
@@ -34,7 +24,7 @@ describe('UserRepository', () => {
   });
 
   it('should find a user by email', async () => {
-    const data = fakeUserData();
+    const data = genUser();
     await repository.create(data);
 
     const found = await repository.findByEmail(data.email);
@@ -43,7 +33,7 @@ describe('UserRepository', () => {
   });
 
   it('should update a user', async () => {
-    const data = fakeUserData();
+    const data = genUser();
     await repository.create(data);
 
     const updated = await repository.update(data.id, { name: 'Updated Name' });
@@ -51,7 +41,7 @@ describe('UserRepository', () => {
   });
 
   it('should delete a user', async () => {
-    const data = fakeUserData();
+    const data = genUser();
     await repository.create(data);
 
     await repository.delete(data.id);
@@ -60,8 +50,8 @@ describe('UserRepository', () => {
   });
 
   it('should return all users', async () => {
-    await repository.create(fakeUserData());
-    await repository.create(fakeUserData());
+    await repository.create(genUser());
+    await repository.create(genUser());
 
     const users = await repository.findAll();
     expect(users.length).toEqual(2);
