@@ -7,8 +7,6 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write './src/**/*.{ts,tsx,json,md}'",
-    "test:prepare": "ts-node scripts/reset-test-db.ts",
-    "test:teardown": "ts-node scripts/drop-test-db.ts",
     "test": "jest --runInBand"
   },
   "author": "Guilherme Staciaki",
