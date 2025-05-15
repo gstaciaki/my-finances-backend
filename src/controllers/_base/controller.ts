@@ -1,3 +1,5 @@
+import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import { InputValidationError } from '@src/errors/input-validation.error';
 import { Right, Wrong } from '@src/util/either';
 import { sendError } from '@src/util/http';
 import { Request, Response } from 'express';
@@ -69,4 +71,27 @@ export abstract class AbstractController<L extends Error, A> {
 
     return error;
   }
+
+  protected handleError(
+  req: Request,
+  res: Response,
+  result: Wrong<L, A> | L,
+): L {
+  const error = result instanceof Wrong ? result.value : result;
+
+  if (error instanceof InputValidationError) {
+    return this.badRequest(req, res, result);
+  }
+
+  if (error instanceof NotFoundError) {
+    return this.notFound(req, res, result);
+  }
+
+  if (error instanceof AlreadyExistsError) {
+    return this.conflict(req, res, result);
+  }
+
+  return this.internalServerError(req, res, result);
+}
+
 }
