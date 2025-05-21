@@ -38,6 +38,7 @@ async function ensureDatabaseExists() {
 }
 
 async function resetDatabase() {
+  console.log('[debug] DATABASE_URL_TEST =', process.env.DATABASE_URL_TEST);
   await waitForDatabase();
 
   await ensureDatabaseExists();
