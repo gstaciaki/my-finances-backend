@@ -24,8 +24,7 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   }
 
   async index(req: Request, res: Response) {
-    const userId = req.params.id;
-    const result = await this.listUsersUseCase.run({ id: userId });
+    const result = await this.listUsersUseCase.run({});
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
