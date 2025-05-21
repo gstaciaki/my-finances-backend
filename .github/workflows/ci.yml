@@ -1,11 +1,3 @@
-name: Continuos Integration
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
-
 jobs:
   test:
     name: Run Tests
@@ -47,6 +39,15 @@ jobs:
 
       - name: Generate Prisma Client
         run: yarn prisma generate
+
+      - name: Inspect DB container
+        run: docker inspect $(docker ps -q --filter name=db)
+
+      - name: Print DB container logs
+        run: docker logs $(docker ps -q --filter name=db)
+
+      - name: Test DNS resolution to db
+        run: nslookup db
 
       - name: Reset test database
         run: yarn ts-node scripts/reset-test-db.ts
