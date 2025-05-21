@@ -42,8 +42,4 @@ export class CPF {
 
     return true;
   }
-
-  public static format(cpf: string): string {
-    return cpf;
-  }
 }
