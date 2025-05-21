@@ -23,6 +23,8 @@ async function ensureDatabaseExists() {
 }
 
 async function resetDatabase() {
+  await waitForDatabase('db', 5432);
+
   const dbUrl = process.env.DATABASE_URL_TEST;
 
   await ensureDatabaseExists();
@@ -44,6 +46,35 @@ async function resetDatabase() {
     console.error('[reset-db] Erro ao resetar banco:', err);
     process.exit(1);
   }
+}
+
+async function waitForDatabase(host: string, port: number, retries = 10, delay = 3000) {
+  const net = await import('net');
+
+  for (let i = 0; i < retries; i++) {
+    const socket = new net.Socket();
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        socket
+          .setTimeout(delay)
+          .once('error', reject)
+          .once('timeout', reject)
+          .connect(port, host, () => {
+            socket.end();
+            resolve();
+          });
+      });
+
+      console.log('[wait-db] Banco de dados disponível');
+      return;
+    } catch (err) {
+      console.log(`[wait-db] Aguardando banco... tentativa ${i + 1}`);
+      await new Promise(res => setTimeout(res, delay));
+    }
+  }
+
+  throw new Error('Banco de dados não está acessível após várias tentativas.');
 }
 
 resetDatabase();
