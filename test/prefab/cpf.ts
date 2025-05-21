@@ -1,9 +1,5 @@
 import { Faker, pt_BR } from '@faker-js/faker';
 
-export function genCpf(): string {
-  return cpf();
-}
-
 const f = new Faker({
   locale: [pt_BR],
 });
@@ -19,7 +15,7 @@ function hashDigit<T>(n: number, overflow: T, max: number = 11): number | T {
   return d >= max - 1 ? (overflow ?? 0) : d;
 }
 
-function cpf(masked: boolean = true) {
+export function cpf(masked: boolean = true) {
   const n = Array.from({ length: 9 }, digit);
 
   let d1 = n.reduce((acc, ni, i) => acc + ni * (10 - i), 0);

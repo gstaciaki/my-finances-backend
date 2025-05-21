@@ -1,6 +1,7 @@
 import { ZodError, ZodIssue } from 'zod';
+import { BaseBusinessError } from './base-business.error';
 
-export class InputValidationError extends Error {
+export class InputValidationError extends BaseBusinessError {
   public readonly issues: ZodIssue[];
   public readonly formatted: Record<string, string[]>;
 
