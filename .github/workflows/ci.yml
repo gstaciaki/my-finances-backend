@@ -6,82 +6,81 @@ on:
     branches:
       - main
 
-test:
-  jobs:
-    test:
-      name: Run Tests
-      runs-on: ubuntu-latest
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
 
-      services:
-        db:
-          image: postgres:14
-          env:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: myfinances_test
-          ports:
-            - 5432:5432
-          options: >-
-            --health-cmd="pg_isready"
-            --health-interval=10s
-            --health-timeout=5s
-            --health-retries=5
+    services:
+      db:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: myfinances_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-      env:
-        DATABASE_URL_TEST: postgresql://postgres:wrong@db:5432/myfinances_test
-        NODE_ENV: test
+    env:
+      DATABASE_URL_TEST: postgresql://postgres:wrong@db:5432/myfinances_test
+      NODE_ENV: test
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-        - name: Create .env
-          run: cp .env.example .env
+      - name: Create .env
+        run: cp .env.example .env
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: 22
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
 
-        - name: Install dependencies
-          run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-        - name: Generate Prisma Client
-          run: yarn prisma generate
+      - name: Generate Prisma Client
+        run: yarn prisma generate
 
-        - name: Inspect DB container
-          run: docker inspect $(docker ps -q --filter name=db)
+      - name: Inspect DB container
+        run: docker inspect $(docker ps -q --filter name=db)
 
-        - name: Print DB container logs
-          run: docker logs $(docker ps -q --filter name=db)
+      - name: Print DB container logs
+        run: docker logs $(docker ps -q --filter name=db)
 
-        - name: Test DNS resolution to db
-          run: nslookup db
+      - name: Test DNS resolution to db
+        run: nslookup db
 
-        - name: Reset test database
-          run: yarn ts-node scripts/reset-test-db.ts
+      - name: Reset test database
+        run: yarn ts-node scripts/reset-test-db.ts
 
-        - name: Run tests
-          run: yarn jest --runInBand
+      - name: Run tests
+        run: yarn jest --runInBand
 
-    code-quality:
-      name: Run ESLint
-      runs-on: ubuntu-latest
+  code-quality:
+    name: Run ESLint
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-        - name: Create .env
-          run: cp .env.example .env
+      - name: Create .env
+        run: cp .env.example .env
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: 22
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
 
-        - name: Install dependencies
-          run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-        - name: Run ESLint
-          run: yarn lint
+      - name: Run ESLint
+        run: yarn lint
