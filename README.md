@@ -110,7 +110,8 @@ docker  compose  up  -d
 
 ```bash
 
-  
+
+./run cmd yarn test:prepare
 
 docker  compose  exec  api  yarn  test
 
@@ -124,8 +125,7 @@ docker  compose  exec  api  yarn  test
 
 ```bash
 
-  
-./run cmd yarn test:prepare
+
 docker  compose  exec  api  yarn  eslint
 
   
