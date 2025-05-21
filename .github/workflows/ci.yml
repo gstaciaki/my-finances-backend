@@ -48,12 +48,6 @@ jobs:
       - name: Generate Prisma Client
         run: yarn prisma generate
 
-      - name: Mostrar logs do Postgres
-        run: docker logs ${{ job.services.db.id }}
-
-      - name: Reset test database
-        run: yarn ts-node scripts/reset-test-db.ts
-
       - name: Run tests
         run: yarn jest --runInBand
 

@@ -8,22 +8,6 @@ const dbUrl = new URL(process.env.DATABASE_URL_TEST!);
 const dbName = dbUrl.pathname.slice(1);
 const adminUrl = dbUrl.toString().replace(`/${dbName}`, '/postgres');
 
-async function waitForDatabase(retries = 20, delay = 3000) {
-  for (let i = 1; i <= retries; i++) {
-    try {
-      const client = new Client({ connectionString: adminUrl });
-      await client.connect();
-      await client.end();
-      console.log(`[wait-db] Banco de dados acessível na tentativa ${i}`);
-      return;
-    } catch (err) {
-      console.log(`[wait-db] Aguardando banco... tentativa ${i}`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
-  throw new Error('Banco de dados não está acessível após várias tentativas.');
-}
-
 async function ensureDatabaseExists() {
   const client = new Client({ connectionString: adminUrl });
   await client.connect();
@@ -39,7 +23,6 @@ async function ensureDatabaseExists() {
 
 async function resetDatabase() {
   console.log('[debug] DATABASE_URL_TEST =', process.env.DATABASE_URL_TEST);
-  // await waitForDatabase();
 
   await ensureDatabaseExists();
 
