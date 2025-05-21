@@ -48,8 +48,11 @@ jobs:
       - name: Generate Prisma Client
         run: yarn prisma generate
 
+      - name: Reset test database
+        run: yarn ts-node scripts/reset-test-db.ts
+
       - name: Run tests
-        run: yarn test
+        run: yarn jest --runInBand
 
   code-quality:
     name: Run ESLint

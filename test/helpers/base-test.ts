@@ -5,8 +5,9 @@ import { prismaTest } from 'jest.setup';
 const prisma = prismaTest;
 export function setupDatabaseLifecycle() {
   beforeAll(() => {
-    console.log('[setup] Executando antes de todos os testes...');
-    execSync('yarn test:prepare', { stdio: 'inherit' });
+    // Removed to stop errors on CI
+    // console.log('[setup] Executando antes de todos os testes...');
+    // execSync('yarn test:prepare', { stdio: 'inherit' });
   });
   beforeEach(async () => {
     await cleanDatabase();
