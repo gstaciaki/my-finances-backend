@@ -1,5 +1,4 @@
-import { User } from '@prisma/client';
-import { prisma } from '../database';
+import { User, PrismaClient } from '@prisma/client';
 import { BaseRepository, IBaseRepository } from './_base/repository';
 
 export interface IUserRepository extends IBaseRepository<User> {
@@ -7,7 +6,12 @@ export interface IUserRepository extends IBaseRepository<User> {
 }
 
 export class UserRepository extends BaseRepository<User> implements IUserRepository {
-  protected model = prisma.user;
+  protected model: PrismaClient['user'];
+
+  constructor(prismaClient: PrismaClient) {
+    super();
+    this.model = prismaClient.user;
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.model.findUnique({ where: { email } });

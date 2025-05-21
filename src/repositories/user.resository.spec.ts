@@ -1,12 +1,13 @@
 import { UserRepository } from './user.repository';
 import { User } from '@src/entities/user.entity';
+import { prismaTest } from 'jest.setup';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
 import { genUser } from 'test/prefab/user';
 
 setupDatabaseLifecycle();
 
 describe('UserRepository', () => {
-  const repository = new UserRepository();
+  const repository = new UserRepository(prismaTest);
 
   it('should create a user', async () => {
     const data = genUser();

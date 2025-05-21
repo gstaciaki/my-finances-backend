@@ -1,7 +1,8 @@
 import { execSync } from 'child_process';
 import { beforeAll, beforeEach } from '@jest/globals';
-import { prisma } from '@src/database';
+import { prismaTest } from 'jest.setup';
 
+const prisma = prismaTest;
 export function setupDatabaseLifecycle() {
   beforeAll(() => {
     console.log('[setup] Executando antes de todos os testes...');
