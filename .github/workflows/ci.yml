@@ -27,7 +27,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL_TEST: postgresql://postgres:postgres@db:5432/myfinances_test
+      DATABASE_URL_TEST: postgresql://postgres:wrong@db:5432/myfinances_test
       NODE_ENV: test
 
     steps:
