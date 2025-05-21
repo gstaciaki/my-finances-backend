@@ -11,9 +11,13 @@ describe('DeleteUserUseCase', () => {
 
   beforeEach(() => {
     userRepo = {
-      findById: jest.fn(),
+      create: jest.fn(),
       delete: jest.fn(),
-    } as any;
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByEmail: jest.fn(),
+      update: jest.fn(),
+    };
 
     useCase = new DeleteUserUseCase(userRepo);
   });

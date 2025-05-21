@@ -11,10 +11,13 @@ describe('UpdateUserUseCase', () => {
 
   beforeEach(() => {
     userRepo = {
+      create: jest.fn(),
+      delete: jest.fn(),
+      findAll: jest.fn(),
       findById: jest.fn(),
       findByEmail: jest.fn(),
       update: jest.fn(),
-    } as any;
+    };
 
     useCase = new UpdateUserUseCase(userRepo);
   });

@@ -13,9 +13,13 @@ describe('CreateUserUseCase', () => {
 
   beforeEach(() => {
     userRepo = {
-      findByEmail: jest.fn(),
       create: jest.fn(),
-    } as any;
+      delete: jest.fn(),
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByEmail: jest.fn(),
+      update: jest.fn(),
+    };
 
     useCase = new CreateUserUseCase(userRepo);
   });

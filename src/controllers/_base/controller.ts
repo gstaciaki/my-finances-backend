@@ -78,10 +78,11 @@ export abstract class AbstractController<L extends Error, A> {
   }
 
   private getErrorMap(): Map<
+    // eslint-disable-next-line
     Function,
     (req: Request, res: Response, result: L | Wrong<L, A>) => L
   > {
-    // @ts-ignore
+    // @ts-expect-error InputValidationError has some additional methods
     return new Map([
       [InputValidationError, this.badRequest.bind(this)],
       [NotFoundError, this.notFound.bind(this)],
