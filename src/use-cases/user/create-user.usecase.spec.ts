@@ -16,6 +16,7 @@ describe('CreateUserUseCase', () => {
       create: jest.fn(),
       delete: jest.fn(),
       findAll: jest.fn(),
+      findWhere: jest.fn(),
       findById: jest.fn(),
       findByEmail: jest.fn(),
       update: jest.fn(),

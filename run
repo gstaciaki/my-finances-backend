@@ -57,6 +57,16 @@ function test {
   dc exec api yarn test "${@}"
 }
 
+function lint {
+  # Run any command you want in the api container
+  dc exec api yarn lint "${@}"
+}
+
+function lint:fix {
+  # Run any command you want in the api container
+  dc exec api yarn lint:fix "${@}"
+}
+
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # Git commands

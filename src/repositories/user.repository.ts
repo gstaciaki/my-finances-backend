@@ -9,7 +9,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
   protected model: PrismaClient['user'];
 
   constructor(prismaClient: PrismaClient) {
-    super();
+    super(prismaClient);
     this.model = prismaClient.user;
   }
 

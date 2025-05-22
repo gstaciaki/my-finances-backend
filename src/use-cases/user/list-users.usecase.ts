@@ -5,6 +5,8 @@ import { Either, right } from '@src/util/either';
 import { ListUsersInput, ListUsersOutput, ListUsersSchema } from './dtos';
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
+import { autoParseFilters } from '@src/util/prisma/parse-filters';
+import { UserMapper } from './mapper';
 
 type Input = ListUsersInput;
 type FailOutput = DefaultFailOutput;
@@ -19,10 +21,25 @@ export class ListUsersUseCase extends AbstractUseCase<Input, FailOutput, Success
     return ListUsersSchema;
   }
 
-  protected async execute(): Promise<Either<FailOutput, SuccessOutput>> {
-    const users = await this.userRepo.findAll();
+  protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
+    const { page = 1, limit = 10, ...rawFilters } = input;
+
+    const [users, total] = await this.userRepo.findWhere({
+      page,
+      limit,
+      filters: autoParseFilters(rawFilters),
+    });
+
     const domainUsers = users.map(user => new User(user));
 
-    return right(domainUsers);
+    return right({
+      data: domainUsers.map(UserMapper.toOutput),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   }
 }
