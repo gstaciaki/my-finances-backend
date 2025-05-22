@@ -1,7 +1,18 @@
 import { User } from '@src/entities/user.entity';
 import { CPF } from '@src/entities/value-objects/cpf';
+import { Paginated } from '@src/types/paginator';
+import { BasePaginatorSchema } from '@src/util/zod/paginator';
 import { zPassword } from '@src/util/zod/zPassword';
 import { z } from 'zod';
+
+export type OutputUser = {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export const CreateUserSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -29,10 +40,13 @@ export const DeleteUserSchema = z.object({
 export type DeleteUserInput = z.infer<typeof DeleteUserSchema>;
 export type DeleteUserOutput = User;
 
-export const ListUsersSchema = z.object({});
+export const ListUsersSchema = BasePaginatorSchema.extend({
+  name: z.string().optional(),
+  email: z.string().optional(),
+});
 
 export type ListUsersInput = z.infer<typeof ListUsersSchema>;
-export type ListUsersOutput = User[];
+export type ListUsersOutput = Paginated<OutputUser>;
 
 export const ShowUserSchema = z.object({
   id: z.string().uuid('ID inválido'),
