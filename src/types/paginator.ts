@@ -1,7 +1,7 @@
 export interface PaginatorParams {
   page: number;
   limit: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, string | Date>;
   orderBy?: {
     field: string;
     direction: 'asc' | 'desc';

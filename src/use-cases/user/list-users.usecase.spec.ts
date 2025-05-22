@@ -1,7 +1,6 @@
 import { ListUsersUseCase } from './list-users.usecase';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { genUser } from 'test/prefab/user';
-import { User } from '@src/entities/user.entity';
 
 describe('ListUsersUseCase', () => {
   let userRepo: jest.Mocked<IUserRepository>;
