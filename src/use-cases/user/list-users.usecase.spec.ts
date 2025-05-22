@@ -12,6 +12,7 @@ describe('ListUsersUseCase', () => {
       create: jest.fn(),
       delete: jest.fn(),
       findAll: jest.fn(),
+      findWhere: jest.fn(),
       findById: jest.fn(),
       findByEmail: jest.fn(),
       update: jest.fn(),
@@ -20,27 +21,61 @@ describe('ListUsersUseCase', () => {
     useCase = new ListUsersUseCase(userRepo);
   });
 
-  it('should return an empty array if no users are found', async () => {
-    userRepo.findAll.mockResolvedValue([]);
+  it('should return empty data array and pagination info when no users found', async () => {
+    userRepo.findWhere.mockResolvedValue([[], 0]);
 
-    const result = await useCase.run({});
+    const result = await useCase.run({ page: 1, limit: 10 });
 
     if (result.isWrong()) fail('Expected result to be Right');
-    expect(result.value).toEqual([]);
-    expect(userRepo.findAll).toHaveBeenCalled();
+
+    expect(result.value).toEqual({
+      data: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      },
+    });
+    expect(userRepo.findWhere).toHaveBeenCalledWith({
+      page: 1,
+      limit: 10,
+      filters: {},
+    });
   });
 
-  it('should return a list of users as User entities', async () => {
-    const users = [genUser(), genUser()];
-    userRepo.findAll.mockResolvedValue(users);
+  it('should return paginated users and pagination info', async () => {
+    const usersRaw = [genUser(), genUser()];
+    const totalCount = 20;
 
-    const result = await useCase.run({});
+    userRepo.findWhere.mockResolvedValue([usersRaw, totalCount]);
+
+    const result = await useCase.run({ page: 2, limit: 2 });
 
     if (result.isWrong()) fail('Expected result to be Right');
-    expect(Array.isArray(result.value)).toBe(true);
-    expect(result.value).toHaveLength(2);
-    expect(result.value[0]).toBeInstanceOf(User);
-    expect(result.value[1]).toBeInstanceOf(User);
-    expect(userRepo.findAll).toHaveBeenCalled();
+
+    expect(Array.isArray(result.value.data)).toBe(true);
+    expect(result.value.data).toHaveLength(usersRaw.length);
+    result.value.data.forEach(userOutput => {
+      expect(userOutput).toHaveProperty('id');
+      expect(userOutput).toHaveProperty('name');
+      expect(userOutput).toHaveProperty('email');
+      expect(userOutput).toHaveProperty('cpf');
+      expect(userOutput).toHaveProperty('createdAt');
+      expect(userOutput).toHaveProperty('updatedAt');
+    });
+
+    expect(result.value.pagination).toEqual({
+      page: 2,
+      limit: 2,
+      total: totalCount,
+      totalPages: Math.ceil(totalCount / 2),
+    });
+
+    expect(userRepo.findWhere).toHaveBeenCalledWith({
+      page: 2,
+      limit: 2,
+      filters: {},
+    });
   });
 });
