@@ -1,10 +1,10 @@
 import { UserController } from '@src/controllers/user.controller';
 import { Request, Response } from 'express';
-import { CreateUserUseCase } from '@src/use-cases/user/create-user.usecase';
-import { ListUsersUseCase } from '@src/use-cases/user/list-users.usecase';
-import { ShowUserUseCase } from '@src/use-cases/user/show-user.usecase';
-import { UpdateUserUseCase } from '@src/use-cases/user/update-user.usecase';
-import { DeleteUserUseCase } from '@src/use-cases/user/delete-user.usecase';
+import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
+import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';
+import { ShowUserUseCase } from '@src/use-cases/user/show-user/show-user.usecase';
+import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.usecase';
+import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { right, wrong } from '@src/util/either';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { ZodError } from 'zod';

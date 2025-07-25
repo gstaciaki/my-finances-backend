@@ -3,7 +3,7 @@ import { AlreadyExistsError } from '@src/errors/generic.errors';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { DefaultFailOutput } from '@src/types/errors';
 import { Either, right, wrong } from '@src/util/either';
-import { CreateUserInput, CreateUserOutput, CreateUserSchema } from './dtos';
+import { CreateUserInput, CreateUserOutput, CreateUserSchema } from '../dtos';
 import { User } from '@src/entities/user.entity';
 import { ZodSchema } from 'zod';
 import PasswordUtil from '@src/util/password';

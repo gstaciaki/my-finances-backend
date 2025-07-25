@@ -3,21 +3,21 @@ import { NotFoundError } from '@src/errors/generic.errors';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { DeleteUserInput, DeleteUserOutput, DeleteUserSchema } from './dtos';
+import { ShowUserInput, ShowUserOutput, ShowUserSchema } from '../dtos';
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 
-type Input = DeleteUserInput;
+type Input = ShowUserInput;
 type FailOutput = DefaultFailOutput;
-type SuccessOutput = DeleteUserOutput;
+type SuccessOutput = ShowUserOutput;
 
-export class DeleteUserUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
+export class ShowUserUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
   constructor(private readonly userRepo: IUserRepository) {
     super();
   }
 
   protected validationRules(): ZodSchema<Input> {
-    return DeleteUserSchema;
+    return ShowUserSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
@@ -28,9 +28,6 @@ export class DeleteUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     }
 
     const domainUser = new User(user);
-
-    await this.userRepo.delete(domainUser.id);
-
     return right(domainUser);
   }
 }
