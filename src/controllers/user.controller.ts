@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { AbstractController } from '@src/controllers/_base/controller';
-import { CreateUserUseCase } from '@src/use-cases/user/create-user.usecase';
-
-import { ListUsersUseCase } from '@src/use-cases/user/list-users.usecase';
-import { ShowUserUseCase } from '@src/use-cases/user/show-user.usecase';
-import { UpdateUserUseCase } from '@src/use-cases/user/update-user.usecase';
-import { DeleteUserUseCase } from '@src/use-cases/user/delete-user.usecase';
+import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
+import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';
+import { ShowUserUseCase } from '@src/use-cases/user/show-user/show-user.usecase';
+import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.usecase';
+import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { DefaultFailOutput } from '@src/types/errors';
 import { UserControllerOutput } from '@src/use-cases/user/dtos';
 

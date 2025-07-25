@@ -2,11 +2,11 @@ import { User } from '@src/entities/user.entity';
 import { IUserRepository } from '@src/repositories/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right } from '@src/util/either';
-import { ListUsersInput, ListUsersOutput, ListUsersSchema } from './dtos';
+import { ListUsersInput, ListUsersOutput, ListUsersSchema } from '../dtos';
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { autoParseFilters } from '@src/util/prisma/parse-filters';
-import { UserMapper } from './mapper';
+import { UserMapper } from '../mapper';
 
 type Input = ListUsersInput;
 type FailOutput = DefaultFailOutput;
