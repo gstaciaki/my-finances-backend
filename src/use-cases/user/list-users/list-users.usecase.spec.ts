@@ -1,5 +1,5 @@
 import { ListUsersUseCase } from './list-users.usecase';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { genUser } from 'test/prefab/user';
 
 describe('ListUsersUseCase', () => {

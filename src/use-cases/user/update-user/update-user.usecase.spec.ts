@@ -1,5 +1,5 @@
 import { UpdateUserUseCase } from './update-user.usecase';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { genUser } from 'test/prefab/user';
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';

@@ -5,7 +5,7 @@ import { ZodSchema } from 'zod';
 import { CreateAccountInput, CreateAccountOutput, CreateAccountSchema } from '../dtos';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { Account } from '@src/entities/account.entity';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { IUserAccountRepository } from '@src/repositories/user-account/user-account.repository';
 

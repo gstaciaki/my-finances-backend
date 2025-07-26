@@ -1,5 +1,5 @@
 import { User } from '@src/entities/user.entity';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right } from '@src/util/either';
 import { ListUsersInput, ListUsersOutput, ListUsersSchema } from '../dtos';

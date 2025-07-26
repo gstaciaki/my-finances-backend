@@ -1,6 +1,6 @@
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { AlreadyExistsError } from '@src/errors/generic.errors';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { DefaultFailOutput } from '@src/types/errors';
 import { Either, right, wrong } from '@src/util/either';
 import { CreateUserInput, CreateUserOutput, CreateUserSchema } from '../dtos';

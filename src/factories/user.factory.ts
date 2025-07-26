@@ -1,6 +1,6 @@
 import { UserController } from '@src/controllers/user.controller';
 import { prisma } from '@src/database';
-import { UserRepository } from '@src/repositories/user.repository';
+import { UserRepository } from '@src/repositories/user/user.repository';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
 import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';

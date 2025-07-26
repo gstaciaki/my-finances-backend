@@ -1,4 +1,4 @@
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { IUserAccountRepository } from '@src/repositories/user-account/user-account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';

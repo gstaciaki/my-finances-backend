@@ -1,6 +1,6 @@
 import { User } from '@src/entities/user.entity';
 import { NotFoundError } from '@src/errors/generic.errors';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { ShowUserInput, ShowUserOutput, ShowUserSchema } from '../dtos';

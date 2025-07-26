@@ -1,5 +1,5 @@
 import { DeleteUserUseCase } from './delete-user.usecase';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { genUser } from 'test/prefab/user';
 import { InputValidationError } from '@src/errors/input-validation.error';
