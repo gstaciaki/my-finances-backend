@@ -8,10 +8,10 @@ export interface UserProps extends BaseProps {
 }
 
 export class User extends BaseEntity {
-  public name: string;
-  public email: string;
-  public password: string;
-  public cpf: string;
+  readonly name: string;
+  readonly email: string;
+  readonly password: string;
+  readonly cpf: string;
 
   constructor({ name, email, password, cpf, ...base }: UserProps) {
     super(base);
