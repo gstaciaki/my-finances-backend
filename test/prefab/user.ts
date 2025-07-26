@@ -3,6 +3,7 @@ import { cpf } from './cpf';
 import { faker } from '@faker-js/faker/.';
 
 type UserInput = {
+  id?: string;
   name?: string;
   email?: string;
   password?: string;
@@ -14,13 +15,14 @@ export const genPassword = (): string => {
 };
 
 export const genUser = ({
+  id = faker.string.uuid(),
   name = faker.person.fullName(),
   email = faker.internet.email(),
   password = genPassword(),
   userCpf = cpf(),
 }: UserInput = {}): User =>
   new User({
-    id: faker.string.uuid(),
+    id,
     name,
     email,
     password,
