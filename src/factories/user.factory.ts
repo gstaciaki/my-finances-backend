@@ -1,11 +1,11 @@
 import { UserController } from '@src/controllers/user.controller';
 import { prisma } from '@src/database';
 import { UserRepository } from '@src/repositories/user.repository';
-import { CreateUserUseCase } from '@src/use-cases/user/create-user.usecase';
-import { DeleteUserUseCase } from '@src/use-cases/user/delete-user.usecase';
-import { ListUsersUseCase } from '@src/use-cases/user/list-users.usecase';
-import { ShowUserUseCase } from '@src/use-cases/user/show-user.usecase';
-import { UpdateUserUseCase } from '@src/use-cases/user/update-user.usecase';
+import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
+import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
+import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';
+import { ShowUserUseCase } from '@src/use-cases/user/show-user/show-user.usecase';
+import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.usecase';
 
 export function makeUserController(): UserController {
   const userRepository = new UserRepository(prisma);
