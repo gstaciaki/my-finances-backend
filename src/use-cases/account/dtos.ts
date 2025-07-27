@@ -24,3 +24,11 @@ export const GetAccountSchema = z.object({
 
 export type GetAccountInput = z.infer<typeof GetAccountSchema>;
 export type GetAccountOutput = Account;
+
+export const UpdateAccountSchema = z.object({
+  id: z.string().uuid('ID Inválido'),
+  name: z.string().optional(),
+});
+
+export type UpdateAccountInput = z.infer<typeof UpdateAccountSchema>;
+export type UpdateAccountOutput = Account;
