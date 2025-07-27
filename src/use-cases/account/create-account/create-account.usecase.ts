@@ -8,6 +8,7 @@ import { Account } from '@src/entities/account.entity';
 import { IUserRepository } from '@src/repositories/user/user.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { IUserAccountRepository } from '@src/repositories/user-account/user-account.repository';
+import { User } from '@src/entities/user.entity';
 
 type Input = CreateAccountInput;
 type FailOutput = DefaultFailOutput;
@@ -27,12 +28,15 @@ export class CreateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
+    const users: User[] = [];
+
     for (const id of input.usersIds) {
       const user = await this.usersRepo.findById(id);
       if (!user) return wrong(new NotFoundError('usuário', 'id', id));
+      users.push(new User(user));
     }
 
-    const account = new Account({ ...input });
+    const account = new Account({ ...input, users });
 
     await this.accountRepo.create(account);
 
