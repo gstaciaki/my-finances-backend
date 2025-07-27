@@ -9,4 +9,15 @@ export class AccountMapper {
       users: users.map(user => ({ accountId: account.id, user, userId: user.id })),
     };
   }
+
+  static fromPrisma(account: AccountWithUsers): Account {
+    const { id, name, createdAt, updatedAt, users } = account;
+    return new Account({
+      id,
+      name,
+      createdAt,
+      updatedAt,
+      users: users.map(user => user.user),
+    });
+  }
 }
