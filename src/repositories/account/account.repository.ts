@@ -2,7 +2,7 @@ import { Account, Prisma, PrismaClient } from '@prisma/client';
 import { BaseRepository, IBaseRepository } from '../_base/repository';
 import { PaginatorParams } from '@src/types/paginator';
 
-type AccountWithUsers = Prisma.AccountGetPayload<{
+export type AccountWithUsers = Prisma.AccountGetPayload<{
   include: {
     users: {
       include: {
@@ -13,6 +13,7 @@ type AccountWithUsers = Prisma.AccountGetPayload<{
 }>;
 
 export interface IAccountRepository extends IBaseRepository<Account> {
+  findById(id: string): Promise<AccountWithUsers | null>;
   findWhere(params: PaginatorParams): Promise<[AccountWithUsers[], number]>;
 }
 
@@ -22,6 +23,19 @@ export class AccountRepository extends BaseRepository<Account> implements IAccou
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
     this.model = prismaClient.account;
+  }
+
+  async findById(id: string): Promise<AccountWithUsers | null> {
+    return this.model.findUnique({
+      where: { id },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
   }
 
   async findWhere(params: PaginatorParams): Promise<[AccountWithUsers[], number]> {

@@ -17,3 +17,10 @@ export const ListAccountsSchema = BasePaginatorSchema.extend({
 
 export type ListAccountsInput = z.infer<typeof ListAccountsSchema>;
 export type ListAccountsOutput = Paginated<Account>;
+
+export const GetAccountSchema = z.object({
+  id: z.string().uuid('ID Inválido'),
+});
+
+export type GetAccountInput = z.infer<typeof GetAccountSchema>;
+export type GetAccountOutput = Account;
