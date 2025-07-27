@@ -1,4 +1,4 @@
-import { UserController } from '@src/controllers/user.controller';
+import { UserController } from '@src/controllers/user/user.controller';
 import { Request, Response } from 'express';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
 import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';

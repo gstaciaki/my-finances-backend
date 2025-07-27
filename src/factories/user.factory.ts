@@ -1,4 +1,4 @@
-import { UserController } from '@src/controllers/user.controller';
+import { UserController } from '@src/controllers/user/user.controller';
 import { prisma } from '@src/database';
 import { UserRepository } from '@src/repositories/user/user.repository';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
