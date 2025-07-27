@@ -6,6 +6,7 @@ import { expectRight } from 'test/helpers/expect-right';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { Account } from '@src/entities/account.entity';
+import { AccountMapper } from '../mapper';
 
 describe('ListAccountsUseCase', () => {
   let accountRepo: jest.Mocked<IAccountRepository>;
@@ -25,7 +26,7 @@ describe('ListAccountsUseCase', () => {
   });
 
   it('should validate input and return error for invalid page', async () => {
-    const input = { page: 'not-a-number' as any };
+    const input = { page: 'not-a-uuid' as any };
 
     const result = await useCase.run(input);
     const error = expectWrong(result);
@@ -36,20 +37,10 @@ describe('ListAccountsUseCase', () => {
   it('should return paginated accounts with their users', async () => {
     const user1 = genUser();
     const user2 = genUser();
-    const account = genAccount({ users: [user1, user2] });
+    const users = [user1, user2];
+    const account = genAccount({ users });
 
-    accountRepo.findWhere.mockResolvedValueOnce([
-      [
-        {
-          ...account,
-          users: [
-            { accountId: account.id, user: user1, userId: user1.id },
-            { accountId: account.id, user: user2, userId: user2.id },
-          ],
-        },
-      ],
-      1,
-    ]);
+    accountRepo.findWhere.mockResolvedValueOnce([[AccountMapper.toPrisma(account, users)], 1]);
 
     const input = { page: 1, limit: 10 };
     const result = await useCase.run(input);
