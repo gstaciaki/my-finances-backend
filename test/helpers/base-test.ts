@@ -1,23 +1,23 @@
 import { beforeEach } from '@jest/globals';
-import { prismaTest } from 'jest.setup';
+import { execSync } from 'node:child_process';
 
-const prisma = prismaTest;
 export function setupDatabaseLifecycle() {
   beforeEach(async () => {
-    await cleanDatabase();
+    if (process.env.NODE_ENV === 'test') {
+      await resetDatabase();
+    } else {
+      console.warn('Reset do banco ignorado porque NODE_ENV não é "test"');
+    }
   });
 }
 
-export async function cleanDatabase() {
-  const modelKeys = Object.keys(prisma).filter(
-    key =>
-      typeof prisma[key as keyof typeof prisma] === 'object' &&
-      // @ts-ignore
-      typeof prisma[key as keyof typeof prisma]?.deleteMany === 'function',
-  );
-
-  for (const model of modelKeys) {
-    // @ts-ignore
-    await prisma[model].deleteMany();
+export async function resetDatabase() {
+  try {
+    execSync('DATABASE_URL=$DATABASE_URL_TEST yarn prisma migrate reset --force --skip-seed', {
+      stdio: 'inherit',
+    });
+  } catch (err) {
+    console.error('Erro ao resetar banco:', err);
+    throw err;
   }
 }
