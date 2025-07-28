@@ -39,3 +39,10 @@ export const DeleteAccountSchema = z.object({
 
 export type DeleteAccountInput = z.infer<typeof DeleteAccountSchema>;
 export type DeleteAccountOutput = Account;
+
+export type AccountControllerOutput =
+  | CreateAccountOutput
+  | ListAccountsOutput
+  | GetAccountOutput
+  | UpdateAccountOutput
+  | DeleteAccountOutput;
