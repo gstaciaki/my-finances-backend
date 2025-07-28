@@ -37,8 +37,9 @@ export class CreateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
     }
 
     const account = new Account({ ...input, users });
+    const { users: accountUsers, ...accountData } = account;
 
-    await this.accountRepo.create(account);
+    await this.accountRepo.create(accountData);
 
     await this.linkUsersToAccount(input.usersIds, account.id);
 

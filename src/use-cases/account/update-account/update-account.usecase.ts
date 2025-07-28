@@ -34,7 +34,9 @@ export class UpdateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
       updatedAt: new Date(),
     });
 
-    await this.accountRepo.update(input.id, updatedAccount);
+    const { users, ...updatedAccountData } = updatedAccount;
+
+    await this.accountRepo.update(input.id, updatedAccountData);
 
     return right(updatedAccount);
   }
