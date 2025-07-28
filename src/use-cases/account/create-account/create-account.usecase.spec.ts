@@ -115,7 +115,12 @@ describe('CreateAccountUseCase', () => {
     expect(account).toBeInstanceOf(Account);
     expect(account.name).toBe(input.name);
 
-    expect(accountRepo.create).toHaveBeenCalledWith(expect.any(Account));
+    expect(accountRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: input.name,
+      }),
+    );
+
     expect(userAccountRepo.create).toHaveBeenCalledTimes(2);
     expect(userAccountRepo.create).toHaveBeenCalledWith({
       userId: user1.id,
