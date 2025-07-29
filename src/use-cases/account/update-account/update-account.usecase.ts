@@ -1,4 +1,4 @@
-import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import { NotFoundError } from '@src/errors/generic.errors';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DefaultFailOutput } from '@src/types/errors';
@@ -6,7 +6,6 @@ import { ZodSchema } from 'zod';
 import { UpdateAccountInput, UpdateAccountOutput, UpdateAccountSchema } from '../dtos';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { Account } from '@src/entities/account.entity';
-import { AccountMapper } from '../mapper';
 
 type Input = UpdateAccountInput;
 type FailOutput = DefaultFailOutput;
@@ -29,7 +28,7 @@ export class UpdateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
     }
 
     const updatedAccount = new Account({
-      ...AccountMapper.fromPrisma({ ...account }),
+      ...account,
       ...input,
       updatedAt: new Date(),
     });

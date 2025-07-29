@@ -3,12 +3,12 @@ import { User } from './user.entity';
 
 export interface AccountProps extends BaseProps {
   name: string;
-  users: User[];
+  users?: User[];
 }
 
 export class Account extends BaseEntity {
   readonly name: string;
-  readonly users: User[];
+  readonly users?: User[];
 
   constructor({ name, users, ...base }: AccountProps) {
     super(base);

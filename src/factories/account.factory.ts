@@ -1,5 +1,7 @@
 import { AccountController } from '@src/controllers/account/account.controller';
 import { prisma } from '@src/database';
+import { GetAccountWithUsersQuery } from '@src/queries/account/get-account-with-users.query';
+import { ListAccountsWithUsersQuery } from '@src/queries/account/list-accounts-with-users.query';
 import { AccountRepository } from '@src/repositories/account/account.repository';
 import { UserAccountRepository } from '@src/repositories/user-account/user-account.repository';
 import { UserRepository } from '@src/repositories/user/user.repository';
@@ -13,13 +15,15 @@ export function makeAccountController(): AccountController {
   const accountRepository = new AccountRepository(prisma);
   const userRepository = new UserRepository(prisma);
   const userAccountRepository = new UserAccountRepository(prisma);
+  const getAccountWithUsersQuery = new GetAccountWithUsersQuery(prisma);
+  const listAccountsWithUsersQuery = new ListAccountsWithUsersQuery(prisma);
   const createAccountUseCase = new CreateAccountUseCase(
     accountRepository,
     userRepository,
     userAccountRepository,
   );
-  const listAccountsUseCase = new ListAccountsUseCase(accountRepository);
-  const getAccountUseCase = new GetAccountUseCase(accountRepository);
+  const listAccountsUseCase = new ListAccountsUseCase(listAccountsWithUsersQuery);
+  const getAccountUseCase = new GetAccountUseCase(getAccountWithUsersQuery);
   const updateAccountUseCase = new UpdateAccountUseCase(accountRepository);
   const deleteAccountUseCase = new DeleteAccountUseCase(accountRepository);
 

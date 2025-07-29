@@ -6,7 +6,6 @@ import { Either, right, wrong } from '@src/util/either';
 import { DeleteAccountInput, DeleteAccountOutput, DeleteAccountSchema } from '../dtos';
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
-import { AccountMapper } from '../mapper';
 
 type Input = DeleteAccountInput;
 type FailOutput = DefaultFailOutput;
@@ -28,7 +27,7 @@ export class DeleteAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
       return wrong(new NotFoundError('usuário', 'id', input.id));
     }
 
-    const domainAccount = new Account(AccountMapper.fromPrisma(account));
+    const domainAccount = new Account(account);
 
     await this.accountRepo.delete(domainAccount.id);
 

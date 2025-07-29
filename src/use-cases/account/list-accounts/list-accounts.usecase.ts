@@ -4,16 +4,16 @@ import { ListAccountsInput, ListAccountsOutput, ListAccountsSchema } from '../dt
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { autoParseFilters } from '@src/util/prisma/parse-filters';
-import { IAccountRepository } from '@src/repositories/account/account.repository';
-import { Account } from '@src/entities/account.entity';
-import { User } from '@src/entities/user.entity';
+
+import { ListAccountsWithUsersQuery } from '@src/queries/account/list-accounts-with-users.query';
+import { AccountMapper } from '../mapper';
 
 type Input = ListAccountsInput;
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = ListAccountsOutput;
 
 export class ListAccountsUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
-  constructor(private readonly accountRepo: IAccountRepository) {
+  constructor(private readonly listAccountsWithUsersQuery: ListAccountsWithUsersQuery) {
     super();
   }
 
@@ -24,22 +24,14 @@ export class ListAccountsUseCase extends AbstractUseCase<Input, FailOutput, Succ
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
     const { page = 1, limit = 10, ...rawFilters } = input;
 
-    const [accounts, total] = await this.accountRepo.findWhere({
+    const { data: accounts, total } = await this.listAccountsWithUsersQuery.execute({
       page,
       limit,
       filters: autoParseFilters(rawFilters),
     });
 
-    const domainAccounts = accounts.map(
-      account =>
-        new Account({
-          ...account,
-          users: account.users.map(userAccount => new User(userAccount.user)),
-        }),
-    );
-
     return right({
-      data: domainAccounts,
+      data: accounts.map(account => AccountMapper.toOutput(account)),
       pagination: {
         page,
         limit,

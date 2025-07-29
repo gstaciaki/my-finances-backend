@@ -1,10 +1,8 @@
-import { AccountMapper } from '@src/use-cases/account/mapper';
 import { AccountRepository } from './account.repository';
 import { prismaTest } from 'jest.setup';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
 import { genAccount } from 'test/prefab/account';
-import { genUser } from 'test/prefab/user';
-import { autoParseFilters } from '@src/util/prisma/parse-filters';
+import { Account } from '@src/entities/account.entity';
 
 setupDatabaseLifecycle();
 
@@ -12,48 +10,42 @@ describe('AccountRepository', () => {
   const repository = new AccountRepository(prismaTest);
 
   it('should create an account', async () => {
-    const { users, ...accountData } = genAccount();
-    const created = await repository.create(accountData);
-    expect(created.id).toBe(accountData.id);
-    expect(created.name).toBe(accountData.name);
+    const data = genAccount();
+    const created = await repository.create(data);
+    expect(new Account(created)).toStrictEqual(data);
   });
 
-  it('should find account by id with users', async () => {
-    const { users, ...accountData } = genAccount();
-    const account = await repository.create(accountData);
+  it('should find an account by id', async () => {
+    const data = genAccount();
+    await repository.create(data);
 
-    const userData = genUser();
-    await prismaTest.user.create({ data: userData });
-    await prismaTest.userAccount.create({
-      data: {
-        userId: userData.id,
-        accountId: account.id,
-      },
-    });
-
-    const found = await repository.findById(account.id);
+    const found = await repository.findById(data.id);
     expect(found).not.toBeNull();
-    expect(found?.id).toBe(account.id);
-    expect(found?.users.length).toBe(1);
-    expect(found?.users[0].user.id).toBe(userData.id);
+    expect(found?.id).toBe(data.id);
   });
 
-  it('should find accounts using filters and pagination', async () => {
-    const { users: usersA, ...accountAData } = genAccount({ name: 'Conta A' });
-    const { users: usersB, ...accountBData } = genAccount({ name: 'Conta B' });
-    const accountA = await repository.create(accountAData);
-    const accountB = await repository.create(accountBData);
+  it('should update an account', async () => {
+    const data = genAccount();
+    await repository.create(data);
 
-    const [results, total] = await repository.findWhere({
-      page: 1,
-      limit: 10,
-      filters: autoParseFilters({ name: 'Conta' }),
-    });
+    const updated = await repository.update(data.id, { name: 'Updated Account' });
+    expect(updated.name).toBe('Updated Account');
+  });
 
-    expect(results.length).toBeGreaterThanOrEqual(2);
-    expect(total).toBeGreaterThanOrEqual(2);
-    expect(results.map(a => a.name)).toEqual(
-      expect.arrayContaining([accountA.name, accountB.name]),
-    );
+  it('should delete an account', async () => {
+    const data = genAccount();
+    await repository.create(data);
+
+    await repository.delete(data.id);
+    const found = await repository.findById(data.id);
+    expect(found).toBeNull();
+  });
+
+  it('should return all accounts', async () => {
+    await repository.create(genAccount());
+    await repository.create(genAccount());
+
+    const accounts = await repository.findAll();
+    expect(accounts.length).toEqual(2);
   });
 });

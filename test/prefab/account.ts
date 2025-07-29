@@ -1,7 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Account } from '@src/entities/account.entity';
 import { User } from '@src/entities/user.entity';
-import { genUser } from './user';
 
 type AccountInput = {
   id?: string;
@@ -14,7 +13,7 @@ type AccountInput = {
 export const genAccount = ({
   id = faker.string.uuid(),
   name = faker.company.name(),
-  users = [genUser()],
+  users,
   createdAt = new Date(),
   updatedAt = new Date(),
 }: AccountInput = {}): Account =>
