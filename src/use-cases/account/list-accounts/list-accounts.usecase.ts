@@ -1,39 +1,37 @@
-import { User } from '@src/entities/user.entity';
-import { IUserRepository } from '@src/repositories/user/user.repository';
 import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { Either, right } from '@src/util/either';
-import { ListUsersInput, ListUsersOutput, ListUsersSchema } from '../dtos';
+import { ListAccountsInput, ListAccountsOutput, ListAccountsSchema } from '../dtos';
 import { ZodSchema } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { autoParseFilters } from '@src/util/prisma/parse-filters';
-import { UserMapper } from '../mapper';
 
-type Input = ListUsersInput;
+import { ListAccountsWithUsersQuery } from '@src/queries/account/list-accounts-with-users.query';
+import { AccountMapper } from '../mapper';
+
+type Input = ListAccountsInput;
 type FailOutput = DefaultFailOutput;
-type SuccessOutput = ListUsersOutput;
+type SuccessOutput = ListAccountsOutput;
 
-export class ListUsersUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
-  constructor(private readonly userRepo: IUserRepository) {
+export class ListAccountsUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
+  constructor(private readonly listAccountsWithUsersQuery: ListAccountsWithUsersQuery) {
     super();
   }
 
   protected validationRules(): ZodSchema<Input> {
-    return ListUsersSchema;
+    return ListAccountsSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
     const { page = 1, limit = 10, ...rawFilters } = input;
 
-    const [users, total] = await this.userRepo.findWhere({
+    const { data: accounts, total } = await this.listAccountsWithUsersQuery.execute({
       page,
       limit,
       filters: autoParseFilters(rawFilters),
     });
 
-    const domainUsers = users.map(user => new User(user));
-
     return right({
-      data: domainUsers.map(UserMapper.toOutput),
+      data: accounts.map(account => AccountMapper.toOutput(account)),
       pagination: {
         page,
         limit,

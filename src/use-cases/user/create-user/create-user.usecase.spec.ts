@@ -1,5 +1,5 @@
 import { AlreadyExistsError } from '@src/errors/generic.errors';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import PasswordUtil from '@src/util/password';
 import { User } from '@src/entities/user.entity';
 import { CreateUserUseCase } from './create-user.usecase';

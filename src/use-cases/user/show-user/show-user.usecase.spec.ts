@@ -1,5 +1,5 @@
 import { ShowUserUseCase } from './show-user.usecase';
-import { IUserRepository } from '@src/repositories/user.repository';
+import { IUserRepository } from '@src/repositories/user/user.repository';
 import { genUser } from 'test/prefab/user';
 import { User } from '@src/entities/user.entity';
 import { NotFoundError } from '@src/errors/generic.errors';

@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -21,4 +22,25 @@ model User {
   cpf       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+
+  accounts  UserAccount[]
+}
+
+model Account {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @default(now())
+
+  users        UserAccount[]
+}
+
+model UserAccount {
+  userId    String  @db.Uuid
+  accountId String  @db.Uuid
+
+  user      User    @relation(fields: [userId], references: [id])
+  account   Account @relation(fields: [accountId], references: [id])
+
+  @@id([userId, accountId])
 }

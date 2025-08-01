@@ -16,8 +16,4 @@ export class BaseEntity {
     this.createdAt = props?.createdAt ?? new Date();
     this.updatedAt = props?.updatedAt ?? new Date();
   }
-
-  touch() {
-    this.updatedAt = new Date();
-  }
 }
