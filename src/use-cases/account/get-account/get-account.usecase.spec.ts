@@ -1,28 +1,22 @@
 import { GetAccountUseCase } from './get-account.usecase';
-import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { expectRight } from 'test/helpers/expect-right';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { genAccount } from 'test/prefab/account';
 import { genUser } from 'test/prefab/user';
-import { AccountMapper } from '../mapper';
+import { GetAccountWithUsersQuery } from '@src/queries/account/get-account-with-users.query';
 
 describe('GetAccountUseCase', () => {
-  let accountRepo: jest.Mocked<IAccountRepository>;
+  let getAccountWithUsersQuery: jest.Mocked<GetAccountWithUsersQuery>;
   let useCase: GetAccountUseCase;
 
   beforeEach(() => {
-    accountRepo = {
-      create: jest.fn(),
-      delete: jest.fn(),
-      findAll: jest.fn(),
-      findById: jest.fn(),
-      findWhere: jest.fn(),
-      update: jest.fn(),
-    };
+    getAccountWithUsersQuery = {
+      execute: jest.fn(),
+    } as any;
 
-    useCase = new GetAccountUseCase(accountRepo);
+    useCase = new GetAccountUseCase(getAccountWithUsersQuery);
   });
 
   it('should return InputValidationError if id is invalid', async () => {
@@ -36,12 +30,13 @@ describe('GetAccountUseCase', () => {
 
   it('should return NotFoundError if account does not exist', async () => {
     const input = { id: '9e6b2b49-4b76-438b-8e1f-9a4eebd9bb44' };
-    accountRepo.findById.mockResolvedValue(null);
+
+    getAccountWithUsersQuery.execute.mockResolvedValue(null);
 
     const result = await useCase.run(input);
     const error = expectWrong(result);
 
-    expect(accountRepo.findById).toHaveBeenCalledWith(input.id);
+    expect(getAccountWithUsersQuery.execute).toHaveBeenCalledWith(input);
     expect(error).toBeInstanceOf(NotFoundError);
   });
 
@@ -49,11 +44,9 @@ describe('GetAccountUseCase', () => {
     const user1 = genUser();
     const user2 = genUser();
     const users = [user1, user2];
-    const account = genAccount({
-      users,
-    });
+    const account = genAccount({ users });
 
-    accountRepo.findById.mockResolvedValue(AccountMapper.toPrisma(account, users));
+    getAccountWithUsersQuery.execute.mockResolvedValue(account);
 
     const result = await useCase.run({ id: account.id });
     const returned = expectRight(result);
@@ -64,9 +57,9 @@ describe('GetAccountUseCase', () => {
   });
 
   it('should return the account with an empty users array if found', async () => {
-    const account = genAccount();
+    const account = genAccount({ users: [] });
 
-    accountRepo.findById.mockResolvedValue(AccountMapper.toPrisma(account));
+    getAccountWithUsersQuery.execute.mockResolvedValue(account);
 
     const result = await useCase.run({ id: account.id });
     const returned = expectRight(result);

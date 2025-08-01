@@ -58,8 +58,8 @@ describe('UpdateAccountUseCase', () => {
       name: 'Nome Atualizado',
     };
 
-    accountRepo.findById.mockResolvedValue(AccountMapper.toPrisma(account));
-    accountRepo.update.mockResolvedValue(AccountMapper.toPrisma({ ...account, ...input }));
+    accountRepo.findById.mockResolvedValue(account);
+    accountRepo.update.mockResolvedValue({ ...account, ...input });
 
     const result = await useCase.run(input);
     const updated = expectRight(result);

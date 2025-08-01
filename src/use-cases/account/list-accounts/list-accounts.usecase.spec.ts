@@ -1,32 +1,25 @@
 import { ListAccountsUseCase } from './list-accounts.usecase';
-import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { genAccount } from 'test/prefab/account';
 import { genUser } from 'test/prefab/user';
 import { expectRight } from 'test/helpers/expect-right';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { InputValidationError } from '@src/errors/input-validation.error';
-import { Account } from '@src/entities/account.entity';
-import { AccountMapper } from '../mapper';
+import { ListAccountsWithUsersQuery } from '@src/queries/account/list-accounts-with-users.query';
 
 describe('ListAccountsUseCase', () => {
-  let accountRepo: jest.Mocked<IAccountRepository>;
+  let listAccountsWithUsersQuery: jest.Mocked<ListAccountsWithUsersQuery>;
   let useCase: ListAccountsUseCase;
 
   beforeEach(() => {
-    accountRepo = {
-      create: jest.fn(),
-      delete: jest.fn(),
-      findAll: jest.fn(),
-      findById: jest.fn(),
-      findWhere: jest.fn(),
-      update: jest.fn(),
-    };
+    listAccountsWithUsersQuery = {
+      execute: jest.fn(),
+    } as any;
 
-    useCase = new ListAccountsUseCase(accountRepo);
+    useCase = new ListAccountsUseCase(listAccountsWithUsersQuery);
   });
 
   it('should validate input and return error for invalid page', async () => {
-    const input = { page: 'not-a-uuid' as any };
+    const input = { page: 'not-a-number' as any };
 
     const result = await useCase.run(input);
     const error = expectWrong(result);
@@ -40,17 +33,19 @@ describe('ListAccountsUseCase', () => {
     const users = [user1, user2];
     const account = genAccount({ users });
 
-    accountRepo.findWhere.mockResolvedValueOnce([[AccountMapper.toPrisma(account, users)], 1]);
+    listAccountsWithUsersQuery.execute.mockResolvedValueOnce({
+      data: [account],
+      total: 1,
+    });
 
     const input = { page: 1, limit: 10 };
     const result = await useCase.run(input);
     const success = expectRight(result);
 
-    expect(accountRepo.findWhere).toHaveBeenCalledWith(
+    expect(listAccountsWithUsersQuery.execute).toHaveBeenCalledWith(
       expect.objectContaining({ page: 1, limit: 10 }),
     );
     expect(success.data).toHaveLength(1);
-    expect(success.data[0]).toBeInstanceOf(Account);
     expect(success.data[0].users).toHaveLength(2);
     expect(success.pagination).toEqual({
       page: 1,
@@ -60,22 +55,24 @@ describe('ListAccountsUseCase', () => {
     });
   });
 
-  it('should set default filters if not seted on input', async () => {
-    const account = genAccount();
+  it('should set default filters if not provided in input', async () => {
+    const account = genAccount({ users: [] });
 
-    accountRepo.findWhere.mockResolvedValueOnce([[{ ...account, users: [] }], 1]);
+    listAccountsWithUsersQuery.execute.mockResolvedValueOnce({
+      data: [account],
+      total: 1,
+    });
 
     const result = await useCase.run({});
     const success = expectRight(result);
 
-    expect(accountRepo.findWhere).toHaveBeenCalledWith(
+    expect(listAccountsWithUsersQuery.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         page: 1,
         limit: 10,
       }),
     );
     expect(success.data).toHaveLength(1);
-    expect(success.data[0]).toBeInstanceOf(Account);
     expect(success.data[0].users).toHaveLength(0);
     expect(success.pagination).toEqual({
       page: 1,
@@ -86,7 +83,10 @@ describe('ListAccountsUseCase', () => {
   });
 
   it('should return empty list if no accounts are found', async () => {
-    accountRepo.findWhere.mockResolvedValueOnce([[], 0]);
+    listAccountsWithUsersQuery.execute.mockResolvedValueOnce({
+      data: [],
+      total: 0,
+    });
 
     const input = { page: 1, limit: 10 };
     const result = await useCase.run(input);

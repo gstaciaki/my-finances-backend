@@ -6,6 +6,7 @@ import { ZodSchema } from 'zod';
 import { UpdateAccountInput, UpdateAccountOutput, UpdateAccountSchema } from '../dtos';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { Account } from '@src/entities/account.entity';
+import { AccountMapper } from '../mapper';
 
 type Input = UpdateAccountInput;
 type FailOutput = DefaultFailOutput;
@@ -33,10 +34,8 @@ export class UpdateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
       updatedAt: new Date(),
     });
 
-    const { users, ...updatedAccountData } = updatedAccount;
+    await this.accountRepo.update(input.id, updatedAccount);
 
-    await this.accountRepo.update(input.id, updatedAccountData);
-
-    return right(updatedAccount);
+    return right(AccountMapper.toOutput(updatedAccount));
   }
 }

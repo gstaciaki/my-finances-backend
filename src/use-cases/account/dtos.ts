@@ -38,7 +38,7 @@ export const UpdateAccountSchema = z.object({
 });
 
 export type UpdateAccountInput = z.infer<typeof UpdateAccountSchema>;
-export type UpdateAccountOutput = Account;
+export type UpdateAccountOutput = OutputAccount;
 
 export const DeleteAccountSchema = z.object({
   id: z.string().uuid('ID Inválido'),
