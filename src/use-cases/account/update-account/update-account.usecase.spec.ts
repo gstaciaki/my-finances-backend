@@ -5,7 +5,6 @@ import { InputValidationError } from '@src/errors/input-validation.error';
 import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
-import { AccountMapper } from '../mapper';
 
 describe('UpdateAccountUseCase', () => {
   let accountRepo: jest.Mocked<IAccountRepository>;

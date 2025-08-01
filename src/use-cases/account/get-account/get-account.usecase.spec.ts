@@ -14,6 +14,7 @@ describe('GetAccountUseCase', () => {
   beforeEach(() => {
     getAccountWithUsersQuery = {
       execute: jest.fn(),
+      // eslint-disable-next-line
     } as any;
 
     useCase = new GetAccountUseCase(getAccountWithUsersQuery);

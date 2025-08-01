@@ -13,14 +13,16 @@ describe('ListAccountsUseCase', () => {
   beforeEach(() => {
     listAccountsWithUsersQuery = {
       execute: jest.fn(),
+      // eslint-disable-next-line
     } as any;
 
     useCase = new ListAccountsUseCase(listAccountsWithUsersQuery);
   });
 
   it('should validate input and return error for invalid page', async () => {
-    const input = { page: 'not-a-number' as any };
+    const input = { page: 'not-a-number' };
 
+    // @ts-expect-error the intention here is to use a wrong type
     const result = await useCase.run(input);
     const error = expectWrong(result);
 
