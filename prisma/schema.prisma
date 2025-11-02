@@ -49,7 +49,7 @@ model UserAccount {
 model Transaction {
   id          String   @id @default(uuid()) @db.Uuid
   accountId   String   @db.Uuid
-  description String   
+  description String?
   amount      Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

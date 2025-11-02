@@ -18,7 +18,7 @@ describe('TransactionRepository', () => {
     const data = genTransaction({ account });
     const created = await repository.create({
       id: data.id,
-      description: data.description,
+      description: data.description ?? null,
       amount: data.amount,
       accountId: account.id,
       createdAt: data.createdAt,
@@ -38,7 +38,7 @@ describe('TransactionRepository', () => {
     const data = genTransaction({ account });
     await repository.create({
       id: data.id,
-      description: data.description,
+      description: data.description ?? null,
       amount: data.amount,
       accountId: account.id,
       createdAt: data.createdAt,
@@ -58,7 +58,7 @@ describe('TransactionRepository', () => {
     const data = genTransaction({ account });
     await repository.create({
       id: data.id,
-      description: data.description,
+      description: data.description ?? null,
       amount: data.amount,
       accountId: account.id,
       createdAt: data.createdAt,
@@ -77,7 +77,7 @@ describe('TransactionRepository', () => {
     const data = genTransaction({ account });
     await repository.create({
       id: data.id,
-      description: data.description,
+      description: data.description ?? null,
       amount: data.amount,
       accountId: account.id,
       createdAt: data.createdAt,
@@ -98,7 +98,7 @@ describe('TransactionRepository', () => {
 
     await repository.create({
       id: transaction1.id,
-      description: transaction1.description,
+      description: transaction1.description ?? null,
       amount: transaction1.amount,
       accountId: account.id,
       createdAt: transaction1.createdAt,
@@ -106,7 +106,7 @@ describe('TransactionRepository', () => {
     });
     await repository.create({
       id: transaction2.id,
-      description: transaction2.description,
+      description: transaction2.description ?? null,
       amount: transaction2.amount,
       accountId: account.id,
       createdAt: transaction2.createdAt,
@@ -128,7 +128,7 @@ describe('TransactionRepository', () => {
 
     await repository.create({
       id: transaction1.id,
-      description: transaction1.description,
+      description: transaction1.description ?? null,
       amount: transaction1.amount,
       accountId: account1.id,
       createdAt: transaction1.createdAt,
@@ -136,7 +136,7 @@ describe('TransactionRepository', () => {
     });
     await repository.create({
       id: transaction2.id,
-      description: transaction2.description,
+      description: transaction2.description ?? null,
       amount: transaction2.amount,
       accountId: account2.id,
       createdAt: transaction2.createdAt,
