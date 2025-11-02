@@ -1,4 +1,3 @@
-import { beforeEach } from '@jest/globals';
 import { execSync } from 'node:child_process';
 
 export function setupDatabaseLifecycle() {
