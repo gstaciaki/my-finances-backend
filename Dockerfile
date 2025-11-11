@@ -1,14 +1,17 @@
 FROM node:24-alpine
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-RUN yarn install
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install
 
 COPY . .
 
-RUN yarn prisma generate
+RUN pnpm prisma generate
 
 EXPOSE 3000
 
-CMD ["yarn", "dev"]
+CMD ["pnpm", "dev"]
