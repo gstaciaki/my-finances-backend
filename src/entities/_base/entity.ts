@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from "crypto";
 
 export interface BaseProps {
   id?: string;
@@ -12,7 +12,7 @@ export class BaseEntity {
   public updatedAt: Date;
 
   constructor(props?: BaseProps) {
-    this.id = props?.id ?? uuid();
+    this.id = props?.id ?? randomUUID();
     this.createdAt = props?.createdAt ?? new Date();
     this.updatedAt = props?.updatedAt ?? new Date();
   }
