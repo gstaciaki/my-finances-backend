@@ -1,7 +1,13 @@
-import { PrismaClient, Transaction } from '@prisma/client';
+import { Prisma, PrismaClient, Transaction } from '@prisma/client';
 import { BaseRepository, IBaseRepository } from '../_base/repository';
 
-export interface ITransacationRepository extends IBaseRepository<Transaction> {}
+type TransactionWithAccount = Prisma.TransactionGetPayload<{
+  include: { account: true };
+}>;
+
+export interface ITransacationRepository extends IBaseRepository<Transaction> {
+  findById(id: string): Promise<TransactionWithAccount | null>;
+}
 
 export class TransactionRepository
   extends BaseRepository<Transaction>
@@ -12,5 +18,12 @@ export class TransactionRepository
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
     this.model = prismaClient.transaction;
+  }
+
+  async findById(id: string): Promise<TransactionWithAccount | null> {
+    return this.model.findUnique({
+      where: { id },
+      include: { account: true },
+    });
   }
 }

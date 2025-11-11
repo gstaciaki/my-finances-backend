@@ -34,7 +34,14 @@ export class CreateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
 
     const transaction = new Transaction({ ...input, account: new Account(account) });
 
-    await this.transactionRepo.create({ ...transaction, accountId: account.id });
+    await this.transactionRepo.create({
+      id: transaction.id,
+      accountId: input.accountId,
+      description: transaction.description,
+      amount: transaction.amount,
+      createdAt: transaction.createdAt,
+      updatedAt: transaction.updatedAt,
+    });
 
     return right(transaction);
   }
