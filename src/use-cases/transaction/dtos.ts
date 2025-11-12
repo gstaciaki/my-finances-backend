@@ -14,7 +14,6 @@ export const CreateTransactionSchema = z.object({
 export type OutputTransaction = BaseProps & {
   amount: string;
   description: string | null;
-  accountId: string;
 };
 
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
@@ -25,30 +24,33 @@ export const ListTransactionsSchema = BasePaginatorSchema.extend({
 });
 
 export type ListTransactionsInput = z.infer<typeof ListTransactionsSchema>;
-export type ListTransactionsOutput = Paginated<Transaction>;
+export type ListTransactionsOutput = Paginated<OutputTransaction>;
 
 export const GetTransactionSchema = z.object({
   id: z.uuid('ID Inválido'),
+  accountId: z.uuid('ID Inválido'),
 });
 
 export type GetTransactionInput = z.infer<typeof GetTransactionSchema>;
-export type GetTransactionOutput = Transaction;
+export type GetTransactionOutput = OutputTransaction;
 
 export const UpdateTransactionSchema = z.object({
   id: z.uuid('ID Inválido'),
-  amount: z.number().optional(),
+  accountId: z.uuid('ID Inválido'),
+  amount: zCurrency.optional(),
   description: z.string().nullable().optional(),
 });
 
 export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
-export type UpdateTransactionOutput = Transaction;
+export type UpdateTransactionOutput = OutputTransaction;
 
 export const DeleteTransactionSchema = z.object({
   id: z.uuid('ID Inválido'),
+  accountId: z.uuid('ID Inválido'),
 });
 
 export type DeleteTransactionInput = z.infer<typeof DeleteTransactionSchema>;
-export type DeleteTransactionOutput = Transaction;
+export type DeleteTransactionOutput = OutputTransaction;
 
 export type TransactionControllerOutput =
   | CreateTransactionOutput

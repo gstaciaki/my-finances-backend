@@ -7,13 +7,17 @@ import { GetTransactionInput, GetTransactionOutput, GetTransactionSchema } from 
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
 import { Transaction } from '@src/entities/transaction.entity';
 import { Account } from '@src/entities/account.entity';
+import { IAccountRepository } from '@src/repositories/account/account.repository';
 
 type Input = GetTransactionInput;
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = GetTransactionOutput;
 
 export class GetTransactionUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
-  constructor(private readonly transactionRepo: ITransacationRepository) {
+  constructor(
+    private readonly transactionRepo: ITransacationRepository,
+    private readonly accountRepo: IAccountRepository,
+  ) {
     super();
   }
 
@@ -22,13 +26,20 @@ export class GetTransactionUseCase extends AbstractUseCase<Input, FailOutput, Su
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
+    const account = await this.accountRepo.findById(input.accountId);
+
+    if (!account) {
+      return wrong(new NotFoundError('conta', 'id', input.accountId));
+    }
+
     const transaction = await this.transactionRepo.findById(input.id);
 
     if (!transaction) {
       return wrong(new NotFoundError('transação', 'id', input.id));
     }
 
-    return right(new Transaction({ ...transaction, account: new Account(transaction.account) }));
+    return right(
+      new Transaction({ ...transaction, account: new Account(transaction.account) }).toOutput(),
+    );
   }
 }
-

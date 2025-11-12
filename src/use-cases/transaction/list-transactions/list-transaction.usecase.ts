@@ -46,6 +46,13 @@ export class ListTransactionsUseCase extends AbstractUseCase<Input, FailOutput, 
       t => new Transaction({ ...t, account: new Account(account) }),
     );
 
-    return right(getPaginationData(domainTransactions, page, limit, total));
+    return right(
+      getPaginationData(
+        domainTransactions.map(dt => dt.toOutput()),
+        page,
+        limit,
+        total,
+      ),
+    );
   }
 }

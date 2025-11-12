@@ -39,7 +39,6 @@ export class Transaction extends BaseEntity {
       updatedAt: this.updatedAt,
       amount: formatCurrencyToOutput(this.amount),
       description: this.description,
-      accountId: this.account.id,
     };
   }
 }

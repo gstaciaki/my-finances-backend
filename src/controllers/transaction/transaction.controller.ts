@@ -34,7 +34,8 @@ export class TransactionController extends AbstractController<FailOutput, Succes
 
   async show(req: Request, res: Response) {
     const transactionId = req.params.id;
-    const result = await this.getTransactionUseCase.run({ id: transactionId });
+    const accountId = req.params.accountId;
+    const result = await this.getTransactionUseCase.run({ id: transactionId, accountId });
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
@@ -46,8 +47,10 @@ export class TransactionController extends AbstractController<FailOutput, Succes
 
   async update(req: Request, res: Response) {
     const transactionId = req.params.id;
+    const accountId = req.params.accountId;
     const result = await this.updateTransactionUseCase.run({
       id: transactionId,
+      accountId,
       ...req.body,
     });
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
@@ -55,7 +58,8 @@ export class TransactionController extends AbstractController<FailOutput, Succes
 
   async delete(req: Request, res: Response) {
     const transactionId = req.params.id;
-    const result = await this.deleteTransactionUseCase.run({ id: transactionId });
+    const accountId = req.params.accountId;
+    const result = await this.deleteTransactionUseCase.run({ id: transactionId, accountId });
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 }

@@ -20,9 +20,15 @@ export function makeTransactionController(): TransactionController {
     transactionRepository,
     accountRepository,
   );
-  const getTransactionUseCase = new GetTransactionUseCase(transactionRepository);
-  const updateTransactionUseCase = new UpdateTransactionUseCase(transactionRepository);
-  const deleteTransactionUseCase = new DeleteTransactionUseCase(transactionRepository);
+  const getTransactionUseCase = new GetTransactionUseCase(transactionRepository, accountRepository);
+  const updateTransactionUseCase = new UpdateTransactionUseCase(
+    transactionRepository,
+    accountRepository,
+  );
+  const deleteTransactionUseCase = new DeleteTransactionUseCase(
+    transactionRepository,
+    accountRepository,
+  );
 
   return new TransactionController(
     createTransactionUseCase,

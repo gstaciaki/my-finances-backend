@@ -7,13 +7,17 @@ import { UpdateTransactionInput, UpdateTransactionOutput, UpdateTransactionSchem
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
 import { Transaction } from '@src/entities/transaction.entity';
 import { Account } from '@src/entities/account.entity';
+import { IAccountRepository } from '@src/repositories/account/account.repository';
 
 type Input = UpdateTransactionInput;
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = UpdateTransactionOutput;
 
 export class UpdateTransactionUseCase extends AbstractUseCase<Input, FailOutput, SuccessOutput> {
-  constructor(private readonly transactionRepo: ITransacationRepository) {
+  constructor(
+    private readonly transactionRepo: ITransacationRepository,
+    private readonly accountRepo: IAccountRepository,
+  ) {
     super();
   }
 
@@ -22,6 +26,12 @@ export class UpdateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
+    const account = await this.accountRepo.findById(input.accountId);
+
+    if (!account) {
+      return wrong(new NotFoundError('conta', 'id', input.accountId));
+    }
+
     const transaction = await this.transactionRepo.findById(input.id);
 
     if (!transaction) {
@@ -36,11 +46,11 @@ export class UpdateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
     });
 
     await this.transactionRepo.update(input.id, {
-      ...updatedTransaction,
+      amount: updatedTransaction.amount,
+      description: updatedTransaction.description,
       accountId: transaction.accountId,
     });
 
-    return right(updatedTransaction);
+    return right(updatedTransaction.toOutput());
   }
 }
-
