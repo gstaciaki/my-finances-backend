@@ -82,7 +82,7 @@ function git:clean:branchs {
 
 function shell {
   # Start a shell session in the api container
-  cmd bash "${@}"
+  cmd sh "${@}"
 }
 
 # -----------------------------------------------------------------------------
