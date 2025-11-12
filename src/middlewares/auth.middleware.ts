@@ -22,7 +22,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
     (req as JwtPayload).user = decoded.user;
     return next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: 'Token inválido' });
   }
 }

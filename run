@@ -59,11 +59,6 @@ function test {
 
 function lint {
   # Run any command you want in the api container
-  dc exec api pnpm lint "${@}"
-}
-
-function lint:fix {
-  # Run any command you want in the api container
   dc exec api pnpm lint:fix "${@}"
 }
 

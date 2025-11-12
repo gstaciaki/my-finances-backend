@@ -38,7 +38,10 @@ describe('LoginUseCase', () => {
 
     userRepo.findByEmail.mockResolvedValue(mockUser);
     jest.spyOn(PasswordUtil, 'comparePasswords').mockResolvedValue(true);
-    jest.spyOn(JWT, 'signToken').mockReturnValueOnce('access.token').mockReturnValueOnce('refresh.token');
+    jest
+      .spyOn(JWT, 'signToken')
+      .mockReturnValueOnce('access.token')
+      .mockReturnValueOnce('refresh.token');
 
     const result = await useCase.run(input);
 
@@ -143,4 +146,3 @@ describe('LoginUseCase', () => {
     expect(userRepo.findByEmail).not.toHaveBeenCalled();
   });
 });
-

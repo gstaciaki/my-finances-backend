@@ -1,5 +1,4 @@
 import { RefreshTokenUseCase } from './refresh-token.usecase';
-import { InputValidationError } from '@src/errors/input-validation.error';
 import { InvalidRefreshTokenError } from '@src/errors/login.errors';
 import JWT from '@src/util/jwt';
 import { TokenPayload } from '@src/middlewares/auth.middleware';
@@ -118,4 +117,3 @@ describe('RefreshTokenUseCase', () => {
     expect(result.value.refreshToken).toBe(input.refreshToken);
   });
 });
-
