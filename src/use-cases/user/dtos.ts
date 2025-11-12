@@ -55,9 +55,19 @@ export const ShowUserSchema = z.object({
 export type ShowUserInput = z.infer<typeof ShowUserSchema>;
 export type ShowUserOutput = User;
 
+export const ChangeUserPasswordSchema = z.object({
+  email: z.email('Email inválido'),
+  currentPassword: z.string(),
+  newPassword: zPassword(),
+});
+
+export type ChangeUserPasswordInput = z.infer<typeof ChangeUserPasswordSchema>;
+export type ChangeUserPasswordOutput = { message: string };
+
 export type UserControllerOutput =
   | CreateUserOutput
   | DeleteUserOutput
   | ListUsersOutput
   | ShowUserOutput
-  | UpdateUserOutput;
+  | UpdateUserOutput
+  | ChangeUserPasswordOutput;

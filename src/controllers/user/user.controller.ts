@@ -7,6 +7,7 @@ import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.u
 import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { DefaultFailOutput } from '@src/types/errors';
 import { ListUsersInput, UserControllerOutput } from '@src/use-cases/user/dtos';
+import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = UserControllerOutput;
@@ -18,6 +19,7 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
     private readonly showUserUseCase: ShowUserUseCase,
     private readonly updateUserUseCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly changeUserPasswordUseCase: ChangeUserPasswordUseCase,
   ) {
     super();
   }
@@ -50,6 +52,11 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   async delete(req: Request, res: Response) {
     const userId = req.params.id;
     const result = await this.deleteUserUseCase.run({ id: userId });
+    return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
+  }
+
+  async changePassword(req: Request, res: Response) {
+    const result = await this.changeUserPasswordUseCase.run(req.body);
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 }

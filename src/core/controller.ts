@@ -1,5 +1,6 @@
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
+import { EmailOrPasswordWrongError } from '@src/errors/login.errors';
 import { Right, Wrong } from '@src/util/either';
 import { sendError } from '@src/util/http';
 import { Request, Response } from 'express';
@@ -87,6 +88,7 @@ export abstract class AbstractController<L extends Error, A> {
       [InputValidationError, this.badRequest.bind(this)],
       [NotFoundError, this.notFound.bind(this)],
       [AlreadyExistsError, this.conflict.bind(this)],
+      [EmailOrPasswordWrongError, this.unauthorized.bind(this)],
     ]);
   }
 

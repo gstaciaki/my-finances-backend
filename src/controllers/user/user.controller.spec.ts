@@ -5,10 +5,12 @@ import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usec
 import { ShowUserUseCase } from '@src/use-cases/user/show-user/show-user.usecase';
 import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.usecase';
 import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
+import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 import { right, wrong } from '@src/util/either';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { ZodError } from 'zod';
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import { EmailOrPasswordWrongError } from '@src/errors/login.errors';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -30,6 +32,7 @@ describe('UserController', () => {
   const showUserUseCase = { run: jest.fn() } as unknown as ShowUserUseCase;
   const updateUserUseCase = { run: jest.fn() } as unknown as UpdateUserUseCase;
   const deleteUserUseCase = { run: jest.fn() } as unknown as DeleteUserUseCase;
+  const changeUserPasswordUseCase = { run: jest.fn() } as unknown as ChangeUserPasswordUseCase;
 
   beforeEach(() => {
     controller = new UserController(
@@ -38,6 +41,7 @@ describe('UserController', () => {
       showUserUseCase,
       updateUserUseCase,
       deleteUserUseCase,
+      changeUserPasswordUseCase,
     );
 
     jsonMock = jest.fn();
@@ -115,12 +119,34 @@ describe('UserController', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
+  it('should return 200 if change password runs successfully', async () => {
+    const successMessage = { message: 'Senha atualizada com sucesso' };
+    (changeUserPasswordUseCase.run as jest.Mock).mockResolvedValue(right(successMessage));
+
+    const req = {
+      body: {
+        email: 'user@example.com',
+        currentPassword: 'OldPass123!',
+        newPassword: 'NewPass123!',
+      },
+    } as unknown as Request;
+    const res = {
+      status: jest.fn().mockReturnValue({ send: jest.fn() }),
+      send: jest.fn(),
+    } as unknown as Response;
+
+    await controller.changePassword(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
   it.each([
     ['index', (c: UserController, r: Request, s: Response) => c.index(r, s)],
     ['show', (c: UserController, r: Request, s: Response) => c.show(r, s)],
     ['create', (c: UserController, r: Request, s: Response) => c.create(r, s)],
     ['update', (c: UserController, r: Request, s: Response) => c.update(r, s)],
     ['delete', (c: UserController, r: Request, s: Response) => c.delete(r, s)],
+    ['changePassword', (c: UserController, r: Request, s: Response) => c.changePassword(r, s)],
   ])('should return 400 if %s use case fails with InputValidationError', async (_, method) => {
     const error = new InputValidationError(new ZodError([]));
 
@@ -129,6 +155,7 @@ describe('UserController', () => {
     (createUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
+    (changeUserPasswordUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
     const req = { params: { id: '123' }, body: {} } as unknown as Request;
     const sendMock = jest.fn();
@@ -178,5 +205,26 @@ describe('UserController', () => {
     await method(controller, req, res);
 
     expect(statusMock).toHaveBeenCalledWith(409);
+  });
+
+  it('should return 401 if changePassword use case fails with EmailOrPasswordWrongError', async () => {
+    const error = new EmailOrPasswordWrongError();
+
+    (changeUserPasswordUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
+
+    const req = {
+      body: {
+        email: 'user@example.com',
+        currentPassword: 'WrongPass123!',
+        newPassword: 'NewPass123!',
+      },
+    } as unknown as Request;
+    const sendMock = jest.fn();
+    const statusMock = jest.fn().mockReturnValue({ send: sendMock });
+    const res = { status: statusMock, send: sendMock } as unknown as Response;
+
+    await controller.changePassword(req, res);
+
+    expect(statusMock).toHaveBeenCalledWith(401);
   });
 });
