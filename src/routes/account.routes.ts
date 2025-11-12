@@ -1,8 +1,11 @@
 import { makeAccountController } from '@src/factories/account.factory';
+import { authMiddleware } from '@src/middlewares/auth.middleware';
 import { RequestHandler, Router } from 'express';
 
 const accountRouter = Router();
 const accountController = makeAccountController();
+
+accountRouter.use(authMiddleware);
 
 accountRouter
   .post('/account', accountController.create.bind(accountController) as RequestHandler)
