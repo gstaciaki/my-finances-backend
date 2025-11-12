@@ -4,10 +4,11 @@ import { NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { Transaction } from '@src/entities/transaction.entity';
 import { genAccount } from 'test/prefab/account';
-import { genTransaction } from 'test/prefab/transaction';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
 import { CreateTransactionUseCase } from './create-transaction.usecase';
+import { formatCurrencyToOutput } from '@src/util/currency';
+import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
 
 describe('CreateTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -118,15 +119,24 @@ describe('CreateTransactionUseCase', () => {
       const result = await useCase.run(input);
       const transaction = expectRight(result);
 
-      expect(transaction).toBeInstanceOf(Transaction);
-      expect(transaction.amount).toBe(input.amount);
+      expect(transaction).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          amount: expect.any(String),
+          description: expect.anything(),
+          accountId: account.id,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        }),
+      );
+      expect(transaction.amount).toBe('5000.0000');
       expect(transaction.description).toBe(input.description);
-      expect(transaction.account.id).toBe(account.id);
+      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          amount: input.amount,
+          amount: input.amount * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: input.description,
           accountId: account.id,
         }),
@@ -145,15 +155,22 @@ describe('CreateTransactionUseCase', () => {
       const result = await useCase.run(input);
       const transaction = expectRight(result);
 
-      expect(transaction).toBeInstanceOf(Transaction);
-      expect(transaction.amount).toBe(input.amount);
+      expect(transaction).toEqual({
+        id: expect.any(String),
+        amount: expect.any(String),
+        description: null,
+        accountId: account.id,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
+      expect(transaction.amount).toBe('2500.0000');
       expect(transaction.description).toBeNull();
-      expect(transaction.account.id).toBe(account.id);
+      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          amount: input.amount,
+          amount: input.amount * Math.pow(10, DECIMAL_PLACES_LIMIT),
           accountId: account.id,
         }),
       );
@@ -172,15 +189,22 @@ describe('CreateTransactionUseCase', () => {
       const result = await useCase.run(input);
       const transaction = expectRight(result);
 
-      expect(transaction).toBeInstanceOf(Transaction);
-      expect(transaction.amount).toBe(input.amount);
+      expect(transaction).toEqual({
+        id: expect.any(String),
+        amount: expect.any(String),
+        description: null,
+        accountId: account.id,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
+      expect(transaction.amount).toBe('1500.0000');
       expect(transaction.description).toBeNull();
-      expect(transaction.account.id).toBe(account.id);
+      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          amount: input.amount,
+          amount: input.amount * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: null,
           accountId: account.id,
         }),
@@ -200,12 +224,21 @@ describe('CreateTransactionUseCase', () => {
       const result = await useCase.run(input);
       const transaction = expectRight(result);
 
-      expect(transaction).toBeInstanceOf(Transaction);
-      expect(transaction.amount).toBe(1);
+      expect(transaction).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          amount: expect.any(String),
+          description: expect.anything(),
+          accountId: account.id,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        }),
+      );
+      expect(transaction.amount).toBe('1.0000');
 
       expect(transactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          amount: 1,
+          amount: 10000,
         }),
       );
     });
@@ -225,12 +258,21 @@ describe('CreateTransactionUseCase', () => {
       const result = await useCase.run(input);
       const transaction = expectRight(result);
 
-      expect(transaction).toBeInstanceOf(Transaction);
-      expect(transaction.amount).toBe(largeAmount);
+      expect(transaction).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          amount: expect.any(String),
+          description: expect.anything(),
+          accountId: account.id,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+        }),
+      );
+      expect(transaction.amount).toBe('999999999.0000');
 
       expect(transactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          amount: largeAmount,
+          amount: largeAmount * Math.pow(10, DECIMAL_PLACES_LIMIT),
         }),
       );
     });

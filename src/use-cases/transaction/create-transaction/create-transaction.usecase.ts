@@ -2,12 +2,12 @@ import { AbstractUseCase } from '@src/use-cases/_base/use-case';
 import { DefaultFailOutput } from '@src/types/errors';
 import { Either, right, wrong } from '@src/util/either';
 import { CreateTransactionInput, CreateTransactionOutput, CreateTransactionSchema } from '../dtos';
-import { ZodSchema } from 'zod';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { Transaction } from '@src/entities/transaction.entity';
 import { Account } from '@src/entities/account.entity';
+import { ZodType } from 'zod';
 
 type Input = CreateTransactionInput;
 type FailOutput = DefaultFailOutput;
@@ -21,7 +21,7 @@ export class CreateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return CreateTransactionSchema;
   }
 
@@ -34,15 +34,8 @@ export class CreateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
 
     const transaction = new Transaction({ ...input, account: new Account(account) });
 
-    await this.transactionRepo.create({
-      id: transaction.id,
-      accountId: input.accountId,
-      description: transaction.description,
-      amount: transaction.amount,
-      createdAt: transaction.createdAt,
-      updatedAt: transaction.updatedAt,
-    });
+    await this.transactionRepo.create(transaction.toPrismaInput());
 
-    return right(transaction);
+    return right(transaction.toOutput());
   }
 }

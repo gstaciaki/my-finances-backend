@@ -1,16 +1,24 @@
+import { BaseProps } from '@src/entities/_base/entity';
 import { Transaction } from '@src/entities/transaction.entity';
 import { Paginated } from '@src/types/paginator';
+import { zCurrency } from '@src/util/zod/currency';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';
 import z from 'zod';
 
 export const CreateTransactionSchema = z.object({
-  amount: z.number(),
+  amount: zCurrency,
   accountId: z.uuid(),
   description: z.string().nullable().optional(),
 });
 
+export type OutputTransaction = BaseProps & {
+  amount: string;
+  description: string | null;
+  accountId: string;
+};
+
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
-export type CreateTransactionOutput = Transaction;
+export type CreateTransactionOutput = OutputTransaction;
 
 export const ListTransactionsSchema = BasePaginatorSchema.extend({
   accountId: z.uuid(),

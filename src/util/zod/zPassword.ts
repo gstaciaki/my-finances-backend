@@ -6,7 +6,7 @@ export const zPassword = () =>
     const error = PasswordUtil.checkPasswordRules(password);
     if (error) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: error,
       });
     }
