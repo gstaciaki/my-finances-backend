@@ -1,8 +1,11 @@
 import { makeUserController } from '@src/factories/user.factory';
+import { authMiddleware } from '@src/middlewares/auth.middleware';
 import { Router } from 'express';
 
 const userRouter = Router();
 const userController = makeUserController();
+
+userRouter.use(authMiddleware);
 
 userRouter
   .post('/', userController.create.bind(userController))

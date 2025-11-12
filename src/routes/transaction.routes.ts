@@ -1,8 +1,11 @@
 import { makeTransactionController } from '@src/factories/transaction.factory';
+import { authMiddleware } from '@src/middlewares/auth.middleware';
 import { RequestHandler, Router } from 'express';
 
 const transactionRouter = Router({ mergeParams: true });
 const transactionController = makeTransactionController();
+
+transactionRouter.use(authMiddleware);
 
 transactionRouter
   .post('/transaction', transactionController.create.bind(transactionController) as RequestHandler)

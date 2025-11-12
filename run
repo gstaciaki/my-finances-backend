@@ -59,11 +59,6 @@ function test {
 
 function lint {
   # Run any command you want in the api container
-  dc exec api pnpm lint "${@}"
-}
-
-function lint:fix {
-  # Run any command you want in the api container
   dc exec api pnpm lint:fix "${@}"
 }
 
@@ -82,7 +77,7 @@ function git:clean:branchs {
 
 function shell {
   # Start a shell session in the api container
-  cmd bash "${@}"
+  cmd sh "${@}"
 }
 
 # -----------------------------------------------------------------------------
