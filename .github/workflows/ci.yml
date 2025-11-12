@@ -49,7 +49,7 @@ jobs:
         run: yarn prisma generate
 
       - name: Reset test database
-        run: yarn ts-node scripts/reset-test-db.ts
+        run: yarn tsx scripts/reset-test-db.ts
 
       - name: Run tests
         run: yarn jest --runInBand
