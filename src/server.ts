@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { routes } from './routes';
+import { env } from '@src/config/env';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api', routes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
