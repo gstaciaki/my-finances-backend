@@ -8,7 +8,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write './src/**/*.{ts,tsx,json,md}'",
-    "test:prepare": "ts-node scripts/reset-test-db.ts",
+    "test:prepare": "tsx scripts/reset-test-db.ts",
     "test": "jest --runInBand",
     "migrate:dev": "prisma migrate dev",
     "migrate:reset": "prisma migrate reset"
