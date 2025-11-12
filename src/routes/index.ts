@@ -5,7 +5,7 @@ import { transactionRouter } from './transaction.routes';
 
 const routes = Router();
 
-routes.use(userRouter);
+routes.use('/user', userRouter);
 
 routes.use(accountRouter);
 

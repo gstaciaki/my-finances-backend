@@ -1,6 +1,7 @@
 import { UserController } from '@src/controllers/user/user.controller';
 import { prisma } from '@src/database';
 import { UserRepository } from '@src/repositories/user/user.repository';
+import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
 import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';
@@ -14,6 +15,7 @@ export function makeUserController(): UserController {
   const showUserUseCase = new ShowUserUseCase(userRepository);
   const updateUserUseCase = new UpdateUserUseCase(userRepository);
   const deleteUserUseCase = new DeleteUserUseCase(userRepository);
+  const changeUserPasswordUseCase = new ChangeUserPasswordUseCase(userRepository);
 
   return new UserController(
     createUserUseCase,
@@ -21,5 +23,6 @@ export function makeUserController(): UserController {
     showUserUseCase,
     updateUserUseCase,
     deleteUserUseCase,
+    changeUserPasswordUseCase,
   );
 }
