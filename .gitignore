@@ -6,5 +6,4 @@ dist/
 
 coverage
 
-.yarn
-.yarnrc.yml
+.pnpm-store

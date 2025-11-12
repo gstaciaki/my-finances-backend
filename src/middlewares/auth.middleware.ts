@@ -1,7 +1,13 @@
-import { env } from '@src/config/env';
+import JWT from '@src/util/jwt';
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 
+export type TokenPayload = {
+  user: {
+    id: string;
+    admin: boolean;
+  };
+};
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
@@ -12,9 +18,9 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   const [, token] = authHeader.split(' ');
 
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const decoded = JWT.verifyToken(token) as TokenPayload;
 
-    (req as JwtPayload).user = decoded;
+    (req as JwtPayload).user = decoded.user;
     return next();
   } catch (err) {
     return res.status(401).json({ message: 'Token inválido' });

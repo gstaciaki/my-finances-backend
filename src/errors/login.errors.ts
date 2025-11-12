@@ -5,3 +5,9 @@ export class EmailOrPasswordWrongError extends BaseBusinessError {
     super('Email ou senha do usuário incorreto');
   }
 }
+
+export class InvalidRefreshTokenError extends BaseBusinessError {
+  constructor() {
+    super('Refresh token é inválido');
+  }
+}
