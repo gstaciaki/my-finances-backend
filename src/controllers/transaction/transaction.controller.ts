@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AbstractController } from '@src/controllers/_base/controller';
+import { AbstractController } from '@src/core/controller';
 import { CreateTransactionUseCase } from '@src/use-cases/transaction/create-transaction/create-transaction.usecase';
 import { ListTransactionsUseCase } from '@src/use-cases/transaction/list-transactions/list-transaction.usecase';
 import { GetTransactionUseCase } from '@src/use-cases/transaction/get-transaction/get-transaction.usecase';

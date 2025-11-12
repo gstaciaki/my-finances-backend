@@ -1,5 +1,5 @@
 import { AccountWithUsers } from '@src/types/account';
-import { BaseQuery } from '../base.query';
+import { BaseQuery } from '../../core/query';
 import { User } from '@src/entities/user.entity';
 
 type Input = {

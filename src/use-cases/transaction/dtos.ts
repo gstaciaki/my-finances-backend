@@ -1,4 +1,4 @@
-import { BaseProps } from '@src/entities/_base/entity';
+import { BaseProps } from '@src/core/entity';
 import { Paginated } from '@src/types/paginator';
 import { zCurrency } from '@src/util/zod/currency';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';

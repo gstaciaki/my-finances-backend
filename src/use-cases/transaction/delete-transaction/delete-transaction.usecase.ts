@@ -2,7 +2,7 @@ import { Transaction } from '@src/entities/transaction.entity';
 import { Account } from '@src/entities/account.entity';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DeleteTransactionInput, DeleteTransactionOutput, DeleteTransactionSchema } from '../dtos';
 import { ZodSchema } from 'zod';

@@ -1,7 +1,7 @@
 import { Account } from '@src/entities/account.entity';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DeleteAccountInput, DeleteAccountOutput, DeleteAccountSchema } from '../dtos';
 import { ZodSchema } from 'zod';

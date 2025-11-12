@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AbstractController } from '@src/controllers/_base/controller';
+import { AbstractController } from '@src/core/controller';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
 import { ListUsersUseCase } from '@src/use-cases/user/list-users/list-users.usecase';
 import { ShowUserUseCase } from '@src/use-cases/user/show-user/show-user.usecase';

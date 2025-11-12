@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient, Transaction } from '@prisma/client';
-import { BaseRepository, IBaseRepository } from '../_base/repository';
+import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 type TransactionWithAccount = Prisma.TransactionGetPayload<{
   include: { account: true };

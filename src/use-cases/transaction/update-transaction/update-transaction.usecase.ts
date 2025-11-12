@@ -1,5 +1,5 @@
 import { NotFoundError } from '@src/errors/generic.errors';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DefaultFailOutput } from '@src/types/errors';
 import { ZodSchema } from 'zod';

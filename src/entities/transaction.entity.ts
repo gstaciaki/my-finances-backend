@@ -1,5 +1,5 @@
 import { OutputTransaction } from '@src/use-cases/transaction/dtos';
-import { BaseEntity, BaseProps } from './_base/entity';
+import { BaseEntity, BaseProps } from '../core/entity';
 import { Account } from './account.entity';
 import { formatCurrencyToOutput } from '@src/util/currency';
 

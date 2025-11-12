@@ -3,7 +3,7 @@ import { Paginated } from '@src/types/paginator';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';
 import { z } from 'zod';
 import { OutputUser } from '../user/dtos';
-import { BaseProps } from '@src/entities/_base/entity';
+import { BaseProps } from '@src/core/entity';
 
 export const CreateAccountSchema = z.object({
   name: z.string().min(1, 'Nome da conta é obrigatório'),

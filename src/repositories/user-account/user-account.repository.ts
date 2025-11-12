@@ -1,5 +1,5 @@
 import { PrismaClient, UserAccount } from '@prisma/client';
-import { BaseRepository, IBaseRepository } from '../_base/repository';
+import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 // eslint-disable-next-line
 export interface IUserAccountRepository extends IBaseRepository<UserAccount> {}

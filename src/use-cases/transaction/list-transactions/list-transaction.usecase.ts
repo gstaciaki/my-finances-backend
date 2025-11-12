@@ -1,4 +1,4 @@
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { ListTransactionsInput, ListTransactionsOutput, ListTransactionsSchema } from '../dtos';
 import { ZodType } from 'zod';

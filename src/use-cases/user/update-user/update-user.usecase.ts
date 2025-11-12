@@ -1,7 +1,7 @@
 import { User } from '@src/entities/user.entity';
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
 import { IUserRepository } from '@src/repositories/user/user.repository';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { UpdateUserInput, UpdateUserOutput, UpdateUserSchema } from '../dtos';
 import { DefaultFailOutput } from '@src/types/errors';
