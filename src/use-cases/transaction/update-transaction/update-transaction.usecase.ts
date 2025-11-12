@@ -34,7 +34,7 @@ export class UpdateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
 
     const transaction = await this.transactionRepo.findById(input.id);
 
-    if (!transaction) {
+    if (!transaction || transaction.accountId !== input.accountId) {
       return wrong(new NotFoundError('transação', 'id', input.id));
     }
 
@@ -45,11 +45,7 @@ export class UpdateTransactionUseCase extends AbstractUseCase<Input, FailOutput,
       updatedAt: new Date(),
     });
 
-    await this.transactionRepo.update(input.id, {
-      amount: updatedTransaction.amount,
-      description: updatedTransaction.description,
-      accountId: transaction.accountId,
-    });
+    await this.transactionRepo.update(input.id, updatedTransaction.toPrismaInput());
 
     return right(updatedTransaction.toOutput());
   }

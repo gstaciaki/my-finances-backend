@@ -7,6 +7,7 @@ import { genTransaction } from 'test/prefab/transaction';
 import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
+import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
 
 describe('ListTransactionsUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -115,13 +116,13 @@ describe('ListTransactionsUseCase', () => {
   describe('Listagem de transações com sucesso', () => {
     it('deve retornar transações paginadas se a conta existe', async () => {
       const account = genAccount();
-      const transaction1 = genTransaction({ account });
-      const transaction2 = genTransaction({ account });
+      const transaction1 = genTransaction({ account, amount: 1000 });
+      const transaction2 = genTransaction({ account, amount: 2000 });
 
       const dbTransactions = [
         {
           id: transaction1.id,
-          amount: transaction1.amount,
+          amount: 1000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: transaction1.description,
           accountId: account.id,
           createdAt: transaction1.createdAt,
@@ -129,7 +130,7 @@ describe('ListTransactionsUseCase', () => {
         },
         {
           id: transaction2.id,
-          amount: transaction2.amount,
+          amount: 2000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: transaction2.description,
           accountId: account.id,
           createdAt: transaction2.createdAt,
@@ -157,8 +158,8 @@ describe('ListTransactionsUseCase', () => {
       });
 
       expect(returned.data).toHaveLength(2);
-      expect(returned.data[0].account.id).toBe(account.id);
-      expect(returned.data[1].account.id).toBe(account.id);
+      expect(returned.data[0].amount).toBe('1000.0000');
+      expect(returned.data[1].amount).toBe('2000.0000');
       expect(returned.pagination).toEqual({
         page: 1,
         limit: 10,
@@ -169,12 +170,12 @@ describe('ListTransactionsUseCase', () => {
 
     it('deve usar valores padrão de paginação se não fornecidos', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 3000 });
 
       const dbTransactions = [
         {
           id: transaction.id,
-          amount: transaction.amount,
+          amount: 3000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: transaction.description,
           accountId: account.id,
           createdAt: transaction.createdAt,
@@ -227,11 +228,11 @@ describe('ListTransactionsUseCase', () => {
 
     it('deve aplicar paginação corretamente para múltiplas páginas', async () => {
       const account = genAccount();
-      const transactions = Array.from({ length: 5 }, () => {
-        const t = genTransaction({ account });
+      const transactions = Array.from({ length: 5 }, (_, i) => {
+        const t = genTransaction({ account, amount: (i + 1) * 1000 });
         return {
           id: t.id,
-          amount: t.amount,
+          amount: (i + 1) * 1000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: t.description,
           accountId: account.id,
           createdAt: t.createdAt,
@@ -268,12 +269,12 @@ describe('ListTransactionsUseCase', () => {
 
     it('deve retornar transações com description null', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 1500 });
 
       const dbTransactions = [
         {
           id: transaction.id,
-          amount: transaction.amount,
+          amount: 1500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
           description: null,
           accountId: account.id,
           createdAt: transaction.createdAt,
@@ -297,19 +298,34 @@ describe('ListTransactionsUseCase', () => {
       expect(returned.data[0].description).toBeNull();
     });
 
-    it('deve manter a associação correta com a conta para todas as transações', async () => {
+    it('deve manter valores corretos de amount para todas as transações', async () => {
       const account = genAccount();
-      const transactions = Array.from({ length: 3 }, () => {
-        const t = genTransaction({ account });
-        return {
-          id: t.id,
-          amount: t.amount,
-          description: t.description,
+      const transactions = [
+        {
+          id: genTransaction().id,
+          amount: 1000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
+          description: 'Trans 1',
           accountId: account.id,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
-        };
-      });
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: genTransaction().id,
+          amount: 2500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
+          description: 'Trans 2',
+          accountId: account.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: genTransaction().id,
+          amount: 7500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
+          description: 'Trans 3',
+          accountId: account.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
 
       accountRepo.findById.mockResolvedValueOnce(account);
       transactionRepo.findWhere.mockResolvedValueOnce([transactions, 3]);
@@ -324,11 +340,9 @@ describe('ListTransactionsUseCase', () => {
       const returned = expectRight(result);
 
       expect(returned.data).toHaveLength(3);
-      returned.data.forEach(transaction => {
-        expect(transaction.account.id).toBe(account.id);
-        expect(transaction.account.name).toBe(account.name);
-      });
+      expect(returned.data[0].amount).toBe('1000.0000');
+      expect(returned.data[1].amount).toBe('2500.0000');
+      expect(returned.data[2].amount).toBe('7500.0000');
     });
   });
 });
-

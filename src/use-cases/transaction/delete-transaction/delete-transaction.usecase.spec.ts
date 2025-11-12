@@ -1,14 +1,17 @@
 import { DeleteTransactionUseCase } from './delete-transaction.usecase';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
+import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { genTransaction } from 'test/prefab/transaction';
 import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
+import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
 
 describe('DeleteTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
+  let accountRepo: jest.Mocked<IAccountRepository>;
   let useCase: DeleteTransactionUseCase;
 
   beforeEach(() => {
@@ -21,13 +24,24 @@ describe('DeleteTransactionUseCase', () => {
       update: jest.fn(),
     };
 
-    useCase = new DeleteTransactionUseCase(transactionRepo);
+    accountRepo = {
+      create: jest.fn(),
+      delete: jest.fn(),
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findWhere: jest.fn(),
+      update: jest.fn(),
+    };
+
+    useCase = new DeleteTransactionUseCase(transactionRepo, accountRepo);
   });
 
   describe('Validação de entrada', () => {
     it('deve retornar InputValidationError se ID é inválido', async () => {
+      const account = genAccount();
       const input = {
         id: 'invalid-id',
+        accountId: account.id,
       };
 
       const result = await useCase.run(input);
@@ -36,9 +50,11 @@ describe('DeleteTransactionUseCase', () => {
       expect(error).toBeInstanceOf(InputValidationError);
     });
 
-    it('deve retornar InputValidationError se ID está vazio', async () => {
+    it('deve retornar InputValidationError se accountId é inválido', async () => {
+      const transaction = genTransaction();
       const input = {
-        id: '',
+        id: transaction.id,
+        accountId: 'invalid-id',
       };
 
       const result = await useCase.run(input);
@@ -48,7 +64,10 @@ describe('DeleteTransactionUseCase', () => {
     });
 
     it('deve retornar InputValidationError se ID não é fornecido', async () => {
-      const input = {} as any;
+      const account = genAccount();
+      const input = {
+        accountId: account.id,
+      } as any;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -58,11 +77,33 @@ describe('DeleteTransactionUseCase', () => {
   });
 
   describe('Regras de negócio', () => {
-    it('deve retornar NotFoundError se a transação não existe', async () => {
+    it('deve retornar NotFoundError se a conta não existe', async () => {
+      const account = genAccount();
+      const transaction = genTransaction({ account });
       const input = {
-        id: 'f2e6b5ca-0c4d-4f9f-908f-f9f3b2a7d211',
+        id: transaction.id,
+        accountId: account.id,
       };
 
+      accountRepo.findById.mockResolvedValue(null);
+
+      const result = await useCase.run(input);
+      const error = expectWrong(result);
+
+      expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
+      expect(error).toBeInstanceOf(NotFoundError);
+      expect(error.message).toContain('conta');
+    });
+
+    it('deve retornar NotFoundError se a transação não existe', async () => {
+      const account = genAccount();
+      const transaction = genTransaction({ account });
+      const input = {
+        id: transaction.id,
+        accountId: account.id,
+      };
+
+      accountRepo.findById.mockResolvedValue(account);
       transactionRepo.findById.mockResolvedValue(null);
 
       const result = await useCase.run(input);
@@ -72,19 +113,50 @@ describe('DeleteTransactionUseCase', () => {
       expect(error).toBeInstanceOf(NotFoundError);
       expect(error.message).toContain('transação');
     });
+
+    it('deve retornar NotFoundError se a transação não pertence à conta', async () => {
+      const account = genAccount();
+      const anotherAccount = genAccount();
+      const transaction = genTransaction({ account: anotherAccount });
+
+      const dbTransaction = {
+        id: transaction.id,
+        amount: transaction.amount * Math.pow(10, DECIMAL_PLACES_LIMIT),
+        description: transaction.description,
+        accountId: anotherAccount.id,
+        account: anotherAccount,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt,
+      };
+
+      const input = {
+        id: transaction.id,
+        accountId: account.id,
+      };
+
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+
+      const result = await useCase.run(input);
+      const error = expectWrong(result);
+
+      expect(error).toBeInstanceOf(NotFoundError);
+      expect(error.message).toContain('transação');
+    });
   });
 
   describe('Deleção de transação com sucesso', () => {
     it('deve deletar a transação se ela existe', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 5000 });
       const input = {
         id: transaction.id,
+        accountId: account.id,
       };
 
       const dbTransaction = {
         id: transaction.id,
-        amount: transaction.amount,
+        amount: 5000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: transaction.description,
         accountId: account.id,
         account: account,
@@ -92,30 +164,33 @@ describe('DeleteTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
       const deleted = expectRight(result);
 
+      expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.findById).toHaveBeenCalledWith(transaction.id);
       expect(transactionRepo.delete).toHaveBeenCalledWith(transaction.id);
 
       expect(deleted.id).toBe(transaction.id);
-      expect(deleted.amount).toBe(transaction.amount);
+      expect(deleted.amount).toBe('5000.0000');
       expect(deleted.description).toBe(transaction.description);
     });
 
     it('deve retornar a transação deletada com todos os dados', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account, amount: 5000 });
+      const transaction = genTransaction({ account, amount: 7500 });
       const input = {
         id: transaction.id,
+        accountId: account.id,
       };
 
       const dbTransaction = {
         id: transaction.id,
-        amount: 5000,
+        amount: 7500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: 'Pagamento de aluguel',
         accountId: account.id,
         account: account,
@@ -123,28 +198,29 @@ describe('DeleteTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
       const deleted = expectRight(result);
 
       expect(deleted.id).toBe(transaction.id);
-      expect(deleted.amount).toBe(5000);
+      expect(deleted.amount).toBe('7500.0000');
       expect(deleted.description).toBe('Pagamento de aluguel');
-      expect(deleted.account.id).toBe(account.id);
     });
 
     it('deve deletar transação com description null', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 2500 });
       const input = {
         id: transaction.id,
+        accountId: account.id,
       };
 
       const dbTransaction = {
         id: transaction.id,
-        amount: transaction.amount,
+        amount: 2500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: null,
         accountId: account.id,
         account: account,
@@ -152,7 +228,8 @@ describe('DeleteTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
@@ -164,14 +241,15 @@ describe('DeleteTransactionUseCase', () => {
 
     it('deve chamar delete apenas uma vez', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 1000 });
       const input = {
         id: transaction.id,
+        accountId: account.id,
       };
 
       const dbTransaction = {
         id: transaction.id,
-        amount: transaction.amount,
+        amount: 1000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: transaction.description,
         accountId: account.id,
         account: account,
@@ -179,7 +257,8 @@ describe('DeleteTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       await useCase.run(input);
@@ -189,4 +268,3 @@ describe('DeleteTransactionUseCase', () => {
     });
   });
 });
-

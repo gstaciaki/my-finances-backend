@@ -53,7 +53,8 @@ describe('TransactionController', () => {
 
   describe('create', () => {
     it('deve retornar 201 se criar transação com sucesso', async () => {
-      await controller.create(mockReq as unknown as Request, mockRes as Response);
+      const req = { params: { accountId: mockAccount.id }, body: {} } as unknown as Request;
+      await controller.create(req, mockRes as Response);
       expect(statusMock).toHaveBeenCalledWith(201);
     });
   });
@@ -72,7 +73,10 @@ describe('TransactionController', () => {
         right(mockPaginatedResult),
       );
       await controller.index(
-        { query: { accountId: mockAccount.id, page: 1, limit: 10 } } as unknown as Request,
+        {
+          params: { accountId: mockAccount.id },
+          query: { page: 1, limit: 10 },
+        } as unknown as Request,
         mockRes as Response,
       );
       expect(statusMock).toHaveBeenCalledWith(200);
@@ -82,7 +86,9 @@ describe('TransactionController', () => {
   describe('show', () => {
     it('deve retornar 200 se buscar transação com sucesso', async () => {
       (getTransactionUseCase.run as jest.Mock).mockResolvedValueOnce(right(mockTransaction));
-      const req = { params: { id: mockTransaction.id } } as unknown as Request;
+      const req = {
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
+      } as unknown as Request;
       await controller.show(req, mockRes as Response);
       expect(statusMock).toHaveBeenCalledWith(200);
     });
@@ -92,7 +98,7 @@ describe('TransactionController', () => {
     it('deve retornar 200 se atualizar transação com sucesso', async () => {
       (updateTransactionUseCase.run as jest.Mock).mockResolvedValueOnce(right(mockTransaction));
       const req = {
-        params: { id: mockTransaction.id },
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
         body: { amount: 2000 },
       } as unknown as Request;
       await controller.update(req, mockRes as Response);
@@ -103,7 +109,9 @@ describe('TransactionController', () => {
   describe('delete', () => {
     it('deve retornar 200 se deletar transação com sucesso', async () => {
       (deleteTransactionUseCase.run as jest.Mock).mockResolvedValueOnce(right(mockTransaction));
-      const req = { params: { id: mockTransaction.id } } as unknown as Request;
+      const req = {
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
+      } as unknown as Request;
       await controller.delete(req, mockRes as Response);
       expect(statusMock).toHaveBeenCalledWith(200);
     });
@@ -128,7 +136,7 @@ describe('TransactionController', () => {
         jest.spyOn(deleteTransactionUseCase, 'run').mockResolvedValue(wrong(error));
 
         const req = {
-          params: { id: mockTransaction.id },
+          params: { id: mockTransaction.id, accountId: mockAccount.id },
           body: {},
           query: {},
         } as unknown as Request;
@@ -153,7 +161,7 @@ describe('TransactionController', () => {
       jest.spyOn(deleteTransactionUseCase, 'run').mockResolvedValue(wrong(error));
 
       const req = {
-        params: { id: mockTransaction.id },
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
         body: {},
       } as unknown as Request;
       const res = { status: statusMock, send: jsonMock } as unknown as Response;
@@ -174,7 +182,7 @@ describe('TransactionController', () => {
       jest.spyOn(updateTransactionUseCase, 'run').mockResolvedValue(wrong(error));
 
       const req = {
-        params: { id: mockTransaction.id },
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
         body: {},
       } as unknown as Request;
       const res = { status: statusMock, send: jsonMock } as unknown as Response;
@@ -223,7 +231,7 @@ describe('TransactionController', () => {
     });
 
     it('deve passar query params para index', async () => {
-      const queryParams = { accountId: mockAccount.id, page: 2, limit: 20 };
+      const queryParams = { page: 2, limit: 20 };
       const mockResult = {
         data: [mockTransaction],
         page: 2,
@@ -233,10 +241,16 @@ describe('TransactionController', () => {
       };
       (listTransactionsUseCase.run as jest.Mock).mockResolvedValueOnce(right(mockResult));
 
-      const req = { query: queryParams } as unknown as Request;
+      const req = {
+        params: { accountId: mockAccount.id },
+        query: queryParams,
+      } as unknown as Request;
       await controller.index(req, mockRes as Response);
 
-      expect(listTransactionsUseCase.run).toHaveBeenCalledWith(queryParams);
+      expect(listTransactionsUseCase.run).toHaveBeenCalledWith({
+        accountId: mockAccount.id,
+        ...queryParams,
+      });
     });
   });
 });

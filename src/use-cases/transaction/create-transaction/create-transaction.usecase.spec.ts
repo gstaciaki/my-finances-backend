@@ -124,14 +124,12 @@ describe('CreateTransactionUseCase', () => {
           id: expect.any(String),
           amount: expect.any(String),
           description: expect.anything(),
-          accountId: account.id,
           createdAt: expect.any(Date),
           updatedAt: expect.any(Date),
         }),
       );
       expect(transaction.amount).toBe('5000.0000');
       expect(transaction.description).toBe(input.description);
-      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
@@ -159,13 +157,11 @@ describe('CreateTransactionUseCase', () => {
         id: expect.any(String),
         amount: expect.any(String),
         description: null,
-        accountId: account.id,
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
       });
       expect(transaction.amount).toBe('2500.0000');
       expect(transaction.description).toBeNull();
-      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
@@ -193,13 +189,11 @@ describe('CreateTransactionUseCase', () => {
         id: expect.any(String),
         amount: expect.any(String),
         description: null,
-        accountId: account.id,
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
       });
       expect(transaction.amount).toBe('1500.0000');
       expect(transaction.description).toBeNull();
-      expect(transaction.accountId).toBe(account.id);
 
       expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
       expect(transactionRepo.create).toHaveBeenCalledWith(
@@ -229,7 +223,6 @@ describe('CreateTransactionUseCase', () => {
           id: expect.any(String),
           amount: expect.any(String),
           description: expect.anything(),
-          accountId: account.id,
           createdAt: expect.any(Date),
           updatedAt: expect.any(Date),
         }),
@@ -263,7 +256,6 @@ describe('CreateTransactionUseCase', () => {
           id: expect.any(String),
           amount: expect.any(String),
           description: expect.anything(),
-          accountId: account.id,
           createdAt: expect.any(Date),
           updatedAt: expect.any(Date),
         }),

@@ -1,14 +1,18 @@
 import { GetTransactionUseCase } from './get-transaction.usecase';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
+import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { expectRight } from 'test/helpers/expect-right';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { genTransaction } from 'test/prefab/transaction';
 import { genAccount } from 'test/prefab/account';
+import { formatCurrencyToOutput } from '@src/util/currency';
+import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
 
 describe('GetTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
+  let accountRepo: jest.Mocked<IAccountRepository>;
   let useCase: GetTransactionUseCase;
 
   beforeEach(() => {
@@ -21,12 +25,22 @@ describe('GetTransactionUseCase', () => {
       update: jest.fn(),
     };
 
-    useCase = new GetTransactionUseCase(transactionRepo);
+    accountRepo = {
+      create: jest.fn(),
+      delete: jest.fn(),
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findWhere: jest.fn(),
+      update: jest.fn(),
+    };
+
+    useCase = new GetTransactionUseCase(transactionRepo, accountRepo);
   });
 
   describe('Validação de entrada', () => {
     it('deve retornar InputValidationError se id é inválido', async () => {
-      const input = { id: 'not-a-uuid' };
+      const account = genAccount();
+      const input = { id: 'not-a-uuid', accountId: account.id };
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -34,8 +48,9 @@ describe('GetTransactionUseCase', () => {
       expect(error).toBeInstanceOf(InputValidationError);
     });
 
-    it('deve retornar InputValidationError se id está vazio', async () => {
-      const input = { id: '' };
+    it('deve retornar InputValidationError se accountId é inválido', async () => {
+      const transaction = genTransaction();
+      const input = { id: transaction.id, accountId: 'not-a-uuid' };
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -44,7 +59,18 @@ describe('GetTransactionUseCase', () => {
     });
 
     it('deve retornar InputValidationError se id não é fornecido', async () => {
-      const input = {} as any;
+      const account = genAccount();
+      const input = { accountId: account.id } as any;
+
+      const result = await useCase.run(input);
+      const error = expectWrong(result);
+
+      expect(error).toBeInstanceOf(InputValidationError);
+    });
+
+    it('deve retornar InputValidationError se accountId não é fornecido', async () => {
+      const transaction = genTransaction();
+      const input = { id: transaction.id } as any;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -54,15 +80,60 @@ describe('GetTransactionUseCase', () => {
   });
 
   describe('Regras de negócio', () => {
-    it('deve retornar NotFoundError se a transação não existe', async () => {
-      const input = { id: '9e6b2b49-4b76-438b-8e1f-9a4eebd9bb44' };
+    it('deve retornar NotFoundError se a conta não existe', async () => {
+      const account = genAccount();
+      const transaction = genTransaction({ account });
+      const input = { id: transaction.id, accountId: account.id };
 
+      accountRepo.findById.mockResolvedValue(null);
+
+      const result = await useCase.run(input);
+      const error = expectWrong(result);
+
+      expect(accountRepo.findById).toHaveBeenCalledWith(account.id);
+      expect(error).toBeInstanceOf(NotFoundError);
+      expect(error.message).toContain('conta');
+    });
+
+    it('deve retornar NotFoundError se a transação não existe', async () => {
+      const account = genAccount();
+      const transaction = genTransaction({ account });
+      const input = { id: transaction.id, accountId: account.id };
+
+      accountRepo.findById.mockResolvedValue(account);
       transactionRepo.findById.mockResolvedValue(null);
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
 
-      expect(transactionRepo.findById).toHaveBeenCalledWith(input.id);
+      expect(transactionRepo.findById).toHaveBeenCalledWith(transaction.id);
+      expect(error).toBeInstanceOf(NotFoundError);
+      expect(error.message).toContain('transação');
+    });
+
+    it('deve retornar NotFoundError se a transação não pertence à conta', async () => {
+      const account = genAccount();
+      const anotherAccount = genAccount();
+      const transaction = genTransaction({ account: anotherAccount });
+
+      const dbTransaction = {
+        id: transaction.id,
+        amount: transaction.amount * Math.pow(10, DECIMAL_PLACES_LIMIT),
+        description: transaction.description,
+        accountId: anotherAccount.id,
+        account: anotherAccount,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt,
+      };
+
+      const input = { id: transaction.id, accountId: account.id };
+
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+
+      const result = await useCase.run(input);
+      const error = expectWrong(result);
+
       expect(error).toBeInstanceOf(NotFoundError);
       expect(error.message).toContain('transação');
     });
@@ -71,11 +142,11 @@ describe('GetTransactionUseCase', () => {
   describe('Busca de transação com sucesso', () => {
     it('deve retornar a transação se ela existe', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 5000 });
 
       const dbTransaction = {
         id: transaction.id,
-        amount: transaction.amount,
+        amount: 5000 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: transaction.description,
         accountId: account.id,
         account: account,
@@ -83,25 +154,25 @@ describe('GetTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
 
-      const result = await useCase.run({ id: transaction.id });
+      const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);
 
       expect(transactionRepo.findById).toHaveBeenCalledWith(transaction.id);
       expect(returned.id).toBe(transaction.id);
-      expect(returned.amount).toBe(transaction.amount);
+      expect(returned.amount).toBe(formatCurrencyToOutput(dbTransaction.amount));
       expect(returned.description).toBe(transaction.description);
-      expect(returned.account.id).toBe(account.id);
     });
 
     it('deve retornar a transação com description null', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account });
+      const transaction = genTransaction({ account, amount: 2500 });
 
       const dbTransaction = {
         id: transaction.id,
-        amount: transaction.amount,
+        amount: 2500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: null,
         accountId: account.id,
         account: account,
@@ -109,9 +180,10 @@ describe('GetTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
 
-      const result = await useCase.run({ id: transaction.id });
+      const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);
 
       expect(returned.id).toBe(transaction.id);
@@ -120,11 +192,11 @@ describe('GetTransactionUseCase', () => {
 
     it('deve retornar a transação com todos os campos preenchidos', async () => {
       const account = genAccount();
-      const transaction = genTransaction({ account, amount: 5000 });
+      const transaction = genTransaction({ account, amount: 7500 });
 
       const dbTransaction = {
         id: transaction.id,
-        amount: 5000,
+        amount: 7500 * Math.pow(10, DECIMAL_PLACES_LIMIT),
         description: 'Pagamento de aluguel',
         accountId: account.id,
         account: account,
@@ -132,16 +204,15 @@ describe('GetTransactionUseCase', () => {
         updatedAt: transaction.updatedAt,
       };
 
-      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      accountRepo.findById.mockResolvedValue(account);
+      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
 
-      const result = await useCase.run({ id: transaction.id });
+      const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);
 
       expect(returned.id).toBe(transaction.id);
-      expect(returned.amount).toBe(5000);
+      expect(returned.amount).toBe('7500.0000');
       expect(returned.description).toBe('Pagamento de aluguel');
-      expect(returned.account.id).toBe(account.id);
     });
   });
 });
-

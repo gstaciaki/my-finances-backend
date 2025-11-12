@@ -34,7 +34,7 @@ export class GetTransactionUseCase extends AbstractUseCase<Input, FailOutput, Su
 
     const transaction = await this.transactionRepo.findById(input.id);
 
-    if (!transaction) {
+    if (!transaction || transaction.accountId !== input.accountId) {
       return wrong(new NotFoundError('transação', 'id', input.id));
     }
 
