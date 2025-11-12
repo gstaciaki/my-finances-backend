@@ -49,9 +49,13 @@ jobs:
         run: yarn prisma generate
 
       - name: Run migrations
-        run: yarn prisma migrate dev
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+        run: yarn prisma migrate deploy
 
       - name: Run tests
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
         run: yarn jest --runInBand
 
   code-quality:
