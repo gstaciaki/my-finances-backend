@@ -1,11 +1,11 @@
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { AlreadyExistsError } from '@src/errors/generic.errors';
 import { IUserRepository } from '@src/repositories/user/user.repository';
 import { DefaultFailOutput } from '@src/types/errors';
 import { Either, right, wrong } from '@src/util/either';
 import { CreateUserInput, CreateUserOutput, CreateUserSchema } from '../dtos';
 import { User } from '@src/entities/user.entity';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import PasswordUtil from '@src/util/password';
 
 type Input = CreateUserInput;
@@ -17,7 +17,7 @@ export class CreateUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return CreateUserSchema;
   }
 

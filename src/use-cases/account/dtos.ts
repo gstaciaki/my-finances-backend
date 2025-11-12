@@ -3,11 +3,11 @@ import { Paginated } from '@src/types/paginator';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';
 import { z } from 'zod';
 import { OutputUser } from '../user/dtos';
-import { BaseProps } from '@src/entities/_base/entity';
+import { BaseProps } from '@src/core/entity';
 
 export const CreateAccountSchema = z.object({
   name: z.string().min(1, 'Nome da conta é obrigatório'),
-  usersIds: z.array(z.string().uuid('ID de usuário inválido')),
+  usersIds: z.array(z.uuid('ID de usuário inválido')),
 });
 
 export type OutputAccount = BaseProps & {
@@ -26,14 +26,14 @@ export type ListAccountsInput = z.infer<typeof ListAccountsSchema>;
 export type ListAccountsOutput = Paginated<OutputAccount>;
 
 export const GetAccountSchema = z.object({
-  id: z.string().uuid('ID Inválido'),
+  id: z.uuid('ID Inválido'),
 });
 
 export type GetAccountInput = z.infer<typeof GetAccountSchema>;
 export type GetAccountOutput = OutputAccount;
 
 export const UpdateAccountSchema = z.object({
-  id: z.string().uuid('ID Inválido'),
+  id: z.uuid('ID Inválido'),
   name: z.string().optional(),
 });
 
@@ -41,7 +41,7 @@ export type UpdateAccountInput = z.infer<typeof UpdateAccountSchema>;
 export type UpdateAccountOutput = OutputAccount;
 
 export const DeleteAccountSchema = z.object({
-  id: z.string().uuid('ID Inválido'),
+  id: z.uuid('ID Inválido'),
 });
 
 export type DeleteAccountInput = z.infer<typeof DeleteAccountSchema>;

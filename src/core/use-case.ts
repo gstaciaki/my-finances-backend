@@ -1,7 +1,7 @@
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { UnknownError } from '@src/errors/unknow.error';
 import { Either, wrong } from '@src/util/either';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 
 export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOutput> {
   constructor() {}
@@ -10,7 +10,7 @@ export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOu
     input?: Input,
   ): Promise<Either<FailOutput | InputValidationError | UnknownError, SuccessOutput>>;
 
-  protected abstract validationRules(): ZodSchema<Input>;
+  protected abstract validationRules(): ZodType<Input>;
 
   public async run(
     input: Input,
@@ -27,7 +27,8 @@ export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOu
       const output = await this.execute(parsedInput);
       return output;
     } catch (error) {
-      return wrong(new UnknownError(error));
+      console.error(error);
+      return wrong(new UnknownError());
     }
   }
 }

@@ -1,5 +1,5 @@
 import { User, PrismaClient } from '@prisma/client';
-import { BaseRepository, IBaseRepository } from '../_base/repository';
+import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 export interface IUserRepository extends IBaseRepository<User> {
   findByEmail(email: string): Promise<User | null>;

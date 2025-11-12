@@ -1,23 +1,20 @@
-import { beforeEach } from '@jest/globals';
-import { execSync } from 'node:child_process';
+import { prismaTest } from 'jest.setup';
+
+const prisma = prismaTest;
 
 export function setupDatabaseLifecycle() {
   beforeEach(async () => {
-    if (process.env.NODE_ENV === 'test') {
-      await resetDatabase();
-    } else {
-      console.warn('Reset do banco ignorado porque NODE_ENV não é "test"');
+    const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
+      SELECT tablename FROM pg_tables WHERE schemaname='public'
+    `;
+
+    const tableNames = tables
+      .filter(t => t.tablename !== '_prisma_migrations')
+      .map(t => `"${t.tablename}"`)
+      .join(', ');
+
+    if (tableNames) {
+      await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`);
     }
   });
-}
-
-export async function resetDatabase() {
-  try {
-    execSync('DATABASE_URL=$DATABASE_URL_TEST yarn prisma migrate reset --force --skip-seed', {
-      stdio: 'inherit',
-    });
-  } catch (err) {
-    console.error('Erro ao resetar banco:', err);
-    throw err;
-  }
 }

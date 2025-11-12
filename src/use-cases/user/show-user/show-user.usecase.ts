@@ -1,10 +1,10 @@
 import { User } from '@src/entities/user.entity';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { IUserRepository } from '@src/repositories/user/user.repository';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { ShowUserInput, ShowUserOutput, ShowUserSchema } from '../dtos';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 
 type Input = ShowUserInput;
@@ -16,7 +16,7 @@ export class ShowUserUseCase extends AbstractUseCase<Input, FailOutput, SuccessO
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return ShowUserSchema;
   }
 

@@ -1,4 +1,4 @@
-import { BaseQuery } from '../base.query';
+import { BaseQuery } from '../../core/query';
 import { autoParseFilters } from '@src/util/prisma/parse-filters';
 import { AccountWithUsers } from '@src/types/account';
 import { PaginatorParams } from '@src/types/paginator';

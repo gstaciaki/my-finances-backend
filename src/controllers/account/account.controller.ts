@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { AbstractController } from '@src/controllers/_base/controller';
+import { AbstractController } from '@src/core/controller';
 import { CreateAccountUseCase } from '@src/use-cases/account/create-account/create-account.usecase';
 import { ListAccountsUseCase } from '@src/use-cases/account/list-accounts/list-accounts.usecase';
 import { GetAccountUseCase } from '@src/use-cases/account/get-account/get-account.usecase';
 import { UpdateAccountUseCase } from '@src/use-cases/account/update-account/update-account.usecase';
 import { DeleteAccountUseCase } from '@src/use-cases/account/delete-account/delete-account.usecase';
 import { DefaultFailOutput } from '@src/types/errors';
-import { AccountControllerOutput } from '@src/use-cases/account/dtos';
+import { AccountControllerOutput, ListAccountsInput } from '@src/use-cases/account/dtos';
 
 type FailOutput = DefaultFailOutput;
 type SuccessOutput = AccountControllerOutput;
@@ -23,7 +23,7 @@ export class AccountController extends AbstractController<FailOutput, SuccessOut
   }
 
   async index(req: Request, res: Response) {
-    const result = await this.listAccountsUseCase.run(req.query);
+    const result = await this.listAccountsUseCase.run(req.query as unknown as ListAccountsInput);
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 

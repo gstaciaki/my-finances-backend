@@ -1,9 +1,9 @@
 import { User } from '@src/entities/user.entity';
 import { IUserRepository } from '@src/repositories/user/user.repository';
-import { AbstractUseCase } from '@src/use-cases/_base/use-case';
+import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right } from '@src/util/either';
 import { ListUsersInput, ListUsersOutput, ListUsersSchema } from '../dtos';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { autoParseFilters } from '@src/util/prisma/parse-filters';
 import { UserMapper } from '../mapper';
@@ -17,12 +17,12 @@ export class ListUsersUseCase extends AbstractUseCase<Input, FailOutput, Success
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return ListUsersSchema;
   }
 
   protected async execute(input: Input): Promise<Either<FailOutput, SuccessOutput>> {
-    const { page = 1, limit = 10, ...rawFilters } = input;
+    const { page, limit, ...rawFilters } = input;
 
     const [users, total] = await this.userRepo.findWhere({
       page,

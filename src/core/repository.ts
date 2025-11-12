@@ -32,7 +32,7 @@ export abstract class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async findWhere(params: PaginatorParams): Promise<[T[], number]> {
-    const { page = 1, limit = 10, filters = {} } = params;
+    const { page, limit, filters = {} } = params;
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.prismaClient.$transaction([

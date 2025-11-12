@@ -54,17 +54,17 @@ function cmd {
 # -----------------------------------------------------------------------------
 function test {
   # Run any command you want in the api container
-  dc exec api yarn test "${@}"
+  dc exec api pnpm test "${@}"
 }
 
 function lint {
   # Run any command you want in the api container
-  dc exec api yarn lint "${@}"
+  dc exec api pnpm lint "${@}"
 }
 
 function lint:fix {
   # Run any command you want in the api container
-  dc exec api yarn lint:fix "${@}"
+  dc exec api pnpm lint:fix "${@}"
 }
 
 # -----------------------------------------------------------------------------

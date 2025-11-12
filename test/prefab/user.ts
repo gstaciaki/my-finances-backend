@@ -1,6 +1,6 @@
 import { User } from '@src/entities/user.entity';
 import { cpf } from './cpf';
-import { faker } from '@faker-js/faker/.';
+import { faker } from '@faker-js/faker';
 import { Account } from '@src/entities/account.entity';
 
 type UserInput = {

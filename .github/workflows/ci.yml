@@ -13,7 +13,7 @@ jobs:
 
     services:
       db:
-        image: postgres:14
+        image: postgres:16
         env:
           POSTGRES_USER: myfinances_user
           POSTGRES_PASSWORD: myfinances_password
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -48,10 +48,14 @@ jobs:
       - name: Generate Prisma Client
         run: yarn prisma generate
 
-      - name: Reset test database
-        run: yarn ts-node scripts/reset-test-db.ts
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
+        run: yarn prisma migrate deploy
 
       - name: Run tests
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
         run: yarn jest --runInBand
 
   code-quality:
@@ -68,7 +72,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
