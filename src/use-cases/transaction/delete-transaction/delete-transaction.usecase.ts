@@ -5,7 +5,7 @@ import { ITransacationRepository } from '@src/repositories/transaction/transacti
 import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DeleteTransactionInput, DeleteTransactionOutput, DeleteTransactionSchema } from '../dtos';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 
@@ -21,7 +21,7 @@ export class DeleteTransactionUseCase extends AbstractUseCase<Input, FailOutput,
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return DeleteTransactionSchema;
   }
 

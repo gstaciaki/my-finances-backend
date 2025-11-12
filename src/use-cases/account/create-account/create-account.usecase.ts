@@ -1,7 +1,7 @@
 import { AbstractUseCase } from '@src/core/use-case';
 import { DefaultFailOutput } from '@src/types/errors';
 import { Either, right, wrong } from '@src/util/either';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { CreateAccountInput, CreateAccountOutput, CreateAccountSchema } from '../dtos';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { Account } from '@src/entities/account.entity';
@@ -23,7 +23,7 @@ export class CreateAccountUseCase extends AbstractUseCase<Input, FailOutput, Suc
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return CreateAccountSchema;
   }
 

@@ -1,4 +1,4 @@
-import { ListTransactionsUseCase } from './list-transaction.usecase';
+import { ListTransactionsUseCase } from './list-transactions.usecase';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';

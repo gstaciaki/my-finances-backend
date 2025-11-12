@@ -1,7 +1,7 @@
 import { NotFoundError } from '@src/errors/generic.errors';
 import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { GetTransactionInput, GetTransactionOutput, GetTransactionSchema } from '../dtos';
 import { ITransacationRepository } from '@src/repositories/transaction/transaction.repository';
@@ -21,7 +21,7 @@ export class GetTransactionUseCase extends AbstractUseCase<Input, FailOutput, Su
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return GetTransactionSchema;
   }
 

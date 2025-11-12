@@ -4,7 +4,7 @@ import { IUserRepository } from '@src/repositories/user/user.repository';
 import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
 import { DeleteUserInput, DeleteUserOutput, DeleteUserSchema } from '../dtos';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 
 type Input = DeleteUserInput;
@@ -16,7 +16,7 @@ export class DeleteUserUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return DeleteUserSchema;
   }
 

@@ -3,7 +3,7 @@ import { prisma } from '@src/database';
 import { AccountRepository } from '@src/repositories/account/account.repository';
 import { TransactionRepository } from '@src/repositories/transaction/transaction.repository';
 import { CreateTransactionUseCase } from '@src/use-cases/transaction/create-transaction/create-transaction.usecase';
-import { ListTransactionsUseCase } from '@src/use-cases/transaction/list-transactions/list-transaction.usecase';
+import { ListTransactionsUseCase } from '@src/use-cases/transaction/list-transactions/list-transactions.usecase';
 import { GetTransactionUseCase } from '@src/use-cases/transaction/get-transaction/get-transaction.usecase';
 import { UpdateTransactionUseCase } from '@src/use-cases/transaction/update-transaction/update-transaction.usecase';
 import { DeleteTransactionUseCase } from '@src/use-cases/transaction/delete-transaction/delete-transaction.usecase';

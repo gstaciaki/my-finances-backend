@@ -1,7 +1,7 @@
 import { NotFoundError } from '@src/errors/generic.errors';
 import { AbstractUseCase } from '@src/core/use-case';
 import { Either, right, wrong } from '@src/util/either';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { DefaultFailOutput } from '@src/types/errors';
 import { GetAccountInput, GetAccountOutput, GetAccountSchema } from '../dtos';
 import { Account } from '@src/entities/account.entity';
@@ -17,7 +17,7 @@ export class GetAccountUseCase extends AbstractUseCase<Input, FailOutput, Succes
     super();
   }
 
-  protected validationRules(): ZodSchema<Input> {
+  protected validationRules(): ZodType<Input> {
     return GetAccountSchema;
   }
 
