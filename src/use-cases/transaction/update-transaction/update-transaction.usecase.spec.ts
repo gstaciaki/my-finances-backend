@@ -8,6 +8,7 @@ import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
 import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
+import { UpdateTransactionInput } from '../dtos';
 
 describe('UpdateTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -70,7 +71,7 @@ describe('UpdateTransactionUseCase', () => {
       const input = {
         accountId: account.id,
         amount: 1000,
-      } as any;
+      } as UpdateTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -141,7 +142,7 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -173,8 +174,8 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
-      transactionRepo.update.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      transactionRepo.update.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const updated = expectRight(result);
@@ -215,8 +216,8 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
-      transactionRepo.update.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      transactionRepo.update.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const updated = expectRight(result);
@@ -253,8 +254,8 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
-      transactionRepo.update.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      transactionRepo.update.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const updated = expectRight(result);
@@ -291,8 +292,8 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
-      transactionRepo.update.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      transactionRepo.update.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const updated = expectRight(result);
@@ -328,8 +329,8 @@ describe('UpdateTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
-      transactionRepo.update.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
+      transactionRepo.update.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const updated = expectRight(result);

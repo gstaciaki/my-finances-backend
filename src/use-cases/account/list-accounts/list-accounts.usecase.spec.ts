@@ -65,7 +65,10 @@ describe('ListAccountsUseCase', () => {
       total: 1,
     });
 
-    const result = await useCase.run({});
+    const result = await useCase.run({
+      page: 1,
+      limit: 10,
+    });
     const success = expectRight(result);
 
     expect(listAccountsWithUsersQuery.execute).toHaveBeenCalledWith(

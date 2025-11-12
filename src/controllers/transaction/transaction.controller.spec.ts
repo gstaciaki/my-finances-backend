@@ -14,7 +14,6 @@ import { genAccount } from 'test/prefab/account';
 
 describe('TransactionController', () => {
   let controller: TransactionController;
-  let mockReq: Partial<Request>;
   let mockRes: Partial<Response>;
   let jsonMock: jest.Mock;
   let statusMock: jest.Mock;
@@ -44,7 +43,6 @@ describe('TransactionController', () => {
     jsonMock = jest.fn();
     statusMock = jest.fn().mockReturnValue({ send: jsonMock });
 
-    mockReq = { body: mockTransaction };
     mockRes = {
       status: statusMock,
       send: jsonMock,
@@ -69,9 +67,7 @@ describe('TransactionController', () => {
         totalPages: 1,
       };
 
-      (listTransactionsUseCase.run as jest.Mock).mockResolvedValueOnce(
-        right(mockPaginatedResult),
-      );
+      (listTransactionsUseCase.run as jest.Mock).mockResolvedValueOnce(right(mockPaginatedResult));
       await controller.index(
         {
           params: { accountId: mockAccount.id },
@@ -124,28 +120,25 @@ describe('TransactionController', () => {
       ['create', (c: TransactionController, r: Request, s: Response) => c.create(r, s)],
       ['update', (c: TransactionController, r: Request, s: Response) => c.update(r, s)],
       ['delete', (c: TransactionController, r: Request, s: Response) => c.delete(r, s)],
-    ])(
-      'deve retornar 400 se %s use case falhar com InputValidationError',
-      async (_, method) => {
-        const error = new InputValidationError(new ZodError([]));
+    ])('deve retornar 400 se %s use case falhar com InputValidationError', async (_, method) => {
+      const error = new InputValidationError(new ZodError([]));
 
-        jest.spyOn(listTransactionsUseCase, 'run').mockResolvedValue(wrong(error));
-        jest.spyOn(getTransactionUseCase, 'run').mockResolvedValue(wrong(error));
-        jest.spyOn(createTransactionUseCase, 'run').mockResolvedValue(wrong(error));
-        jest.spyOn(updateTransactionUseCase, 'run').mockResolvedValue(wrong(error));
-        jest.spyOn(deleteTransactionUseCase, 'run').mockResolvedValue(wrong(error));
+      jest.spyOn(listTransactionsUseCase, 'run').mockResolvedValue(wrong(error));
+      jest.spyOn(getTransactionUseCase, 'run').mockResolvedValue(wrong(error));
+      jest.spyOn(createTransactionUseCase, 'run').mockResolvedValue(wrong(error));
+      jest.spyOn(updateTransactionUseCase, 'run').mockResolvedValue(wrong(error));
+      jest.spyOn(deleteTransactionUseCase, 'run').mockResolvedValue(wrong(error));
 
-        const req = {
-          params: { id: mockTransaction.id, accountId: mockAccount.id },
-          body: {},
-          query: {},
-        } as unknown as Request;
-        const res = { status: statusMock, send: jsonMock } as unknown as Response;
+      const req = {
+        params: { id: mockTransaction.id, accountId: mockAccount.id },
+        body: {},
+        query: {},
+      } as unknown as Request;
+      const res = { status: statusMock, send: jsonMock } as unknown as Response;
 
-        await method(controller, req, res);
-        expect(statusMock).toHaveBeenCalledWith(400);
-      },
-    );
+      await method(controller, req, res);
+      expect(statusMock).toHaveBeenCalledWith(400);
+    });
   });
 
   describe('Tratamento de erros - NotFoundError', () => {
@@ -254,4 +247,3 @@ describe('TransactionController', () => {
     });
   });
 });
-

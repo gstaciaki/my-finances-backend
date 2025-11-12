@@ -8,6 +8,7 @@ import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
 import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
+import { ListTransactionsInput } from '../dtos';
 
 describe('ListTransactionsUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -41,7 +42,7 @@ describe('ListTransactionsUseCase', () => {
       const input = {
         page: 1,
         limit: 10,
-      } as any;
+      } as ListTransactionsInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);

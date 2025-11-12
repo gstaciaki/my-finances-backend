@@ -9,6 +9,7 @@ import { genTransaction } from 'test/prefab/transaction';
 import { genAccount } from 'test/prefab/account';
 import { formatCurrencyToOutput } from '@src/util/currency';
 import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
+import { GetTransactionInput } from '../dtos';
 
 describe('GetTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -60,7 +61,7 @@ describe('GetTransactionUseCase', () => {
 
     it('deve retornar InputValidationError se id não é fornecido', async () => {
       const account = genAccount();
-      const input = { accountId: account.id } as any;
+      const input = { accountId: account.id } as GetTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -70,7 +71,7 @@ describe('GetTransactionUseCase', () => {
 
     it('deve retornar InputValidationError se accountId não é fornecido', async () => {
       const transaction = genTransaction();
-      const input = { id: transaction.id } as any;
+      const input = { id: transaction.id } as GetTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -129,7 +130,7 @@ describe('GetTransactionUseCase', () => {
       const input = { id: transaction.id, accountId: account.id };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -155,7 +156,7 @@ describe('GetTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);
@@ -181,7 +182,7 @@ describe('GetTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);
@@ -205,7 +206,7 @@ describe('GetTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run({ id: transaction.id, accountId: account.id });
       const returned = expectRight(result);

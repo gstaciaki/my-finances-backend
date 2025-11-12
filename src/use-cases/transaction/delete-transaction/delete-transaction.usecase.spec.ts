@@ -8,6 +8,7 @@ import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
 import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
+import { DeleteTransactionInput } from '../dtos';
 
 describe('DeleteTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -67,7 +68,7 @@ describe('DeleteTransactionUseCase', () => {
       const account = genAccount();
       const input = {
         accountId: account.id,
-      } as any;
+      } as DeleteTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -135,7 +136,7 @@ describe('DeleteTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -165,7 +166,7 @@ describe('DeleteTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
@@ -199,7 +200,7 @@ describe('DeleteTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
@@ -229,7 +230,7 @@ describe('DeleteTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       const result = await useCase.run(input);
@@ -258,7 +259,7 @@ describe('DeleteTransactionUseCase', () => {
       };
 
       accountRepo.findById.mockResolvedValue(account);
-      transactionRepo.findById.mockResolvedValue(dbTransaction as any);
+      transactionRepo.findById.mockResolvedValue(dbTransaction);
       transactionRepo.delete.mockResolvedValue(undefined);
 
       await useCase.run(input);

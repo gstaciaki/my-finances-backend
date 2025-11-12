@@ -2,13 +2,12 @@ import { ITransacationRepository } from '@src/repositories/transaction/transacti
 import { IAccountRepository } from '@src/repositories/account/account.repository';
 import { NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
-import { Transaction } from '@src/entities/transaction.entity';
 import { genAccount } from 'test/prefab/account';
 import { expectWrong } from 'test/helpers/expect-wrong';
 import { expectRight } from 'test/helpers/expect-right';
 import { CreateTransactionUseCase } from './create-transaction.usecase';
-import { formatCurrencyToOutput } from '@src/util/currency';
 import { DECIMAL_PLACES_LIMIT } from '@src/util/zod/currency';
+import { CreateTransactionInput } from '../dtos';
 
 describe('CreateTransactionUseCase', () => {
   let transactionRepo: jest.Mocked<ITransacationRepository>;
@@ -41,7 +40,7 @@ describe('CreateTransactionUseCase', () => {
     it('deve retornar InputValidationError se amount não for fornecido', async () => {
       const input = {
         accountId: genAccount().id,
-      } as any;
+      } as CreateTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
@@ -52,7 +51,7 @@ describe('CreateTransactionUseCase', () => {
     it('deve retornar InputValidationError se accountId não for fornecido', async () => {
       const input = {
         amount: 1000,
-      } as any;
+      } as CreateTransactionInput;
 
       const result = await useCase.run(input);
       const error = expectWrong(result);
