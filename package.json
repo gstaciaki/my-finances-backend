@@ -5,13 +5,9 @@
   "main": "server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "format": "prettier --write './src/**/*.{ts,tsx,json,md}'",
-    "test:prepare": "tsx scripts/reset-test-db.ts",
+    "lint": "eslint src --fix",
     "test": "jest --runInBand",
-    "migrate:dev": "prisma migrate dev",
-    "migrate:reset": "prisma migrate reset"
+    "migrate:dev": "prisma migrate dev"
   },
   "author": "Guilherme Staciaki",
   "license": "ISC",
