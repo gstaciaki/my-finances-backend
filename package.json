@@ -7,7 +7,8 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --fix",
     "test": "jest --runInBand",
-    "migrate:dev": "prisma migrate dev"
+    "migrate:dev": "prisma migrate dev",
+    "seed": "tsx src/database/seed.ts"
   },
   "author": "Guilherme Staciaki",
   "license": "ISC",
