@@ -8,7 +8,8 @@
     "lint": "eslint src --fix",
     "test": "jest --runInBand",
     "migrate:dev": "prisma migrate dev",
-    "seed": "tsx src/database/seed.ts"
+    "seed": "tsx src/database/seed.ts",
+    "populate": "tsx src/database/populate.ts"
   },
   "author": "Guilherme Staciaki",
   "license": "ISC",
