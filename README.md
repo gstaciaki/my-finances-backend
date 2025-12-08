@@ -52,8 +52,6 @@ curl --location 'http://localhost:3000/health'
 
 ```bash
 
-./run cmd pnpm test:prepare
-
 ./run cmd pnpm test
 
 ```
