@@ -59,7 +59,7 @@ function test {
 
 function lint {
   # Run any command you want in the api container
-  dc exec api pnpm lint:fix "${@}"
+  dc exec api pnpm lint "${@}"
 }
 
 # -----------------------------------------------------------------------------
@@ -78,16 +78,6 @@ function git:clean:branchs {
 function shell {
   # Start a shell session in the api container
   cmd sh "${@}"
-}
-
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-# Database commands.
-# -----------------------------------------------------------------------------
-function psql {
-  # Connect to PostgreSQL with psql
-  # shellcheck disable=SC1091
-  _dc db psql -U postgres "${@}"
 }
 
 function help {
