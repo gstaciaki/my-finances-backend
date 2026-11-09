@@ -1,6 +1,6 @@
 import { genAccount } from 'test/prefab/account';
 import { prisma } from '..';
-import { Account } from '@prisma/client';
+import { Account } from '@src/generated/prisma/client';
 
 export async function populateAccounts() {
   console.log('Creating accounts...');

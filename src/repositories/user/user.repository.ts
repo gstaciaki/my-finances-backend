@@ -1,4 +1,4 @@
-import { User, PrismaClient } from '@prisma/client';
+import { User, PrismaClient } from '@src/generated/prisma/client';
 import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 export interface IUserRepository extends IBaseRepository<User> {

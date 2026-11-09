@@ -1,6 +1,6 @@
 import { genUser } from 'test/prefab/user';
 import { prisma } from '..';
-import { User } from '@prisma/client';
+import { User } from '@src/generated/prisma/client';
 import PasswordUtil from '@src/util/password';
 
 export async function populateUsers() {

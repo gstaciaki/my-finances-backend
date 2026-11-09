@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@src/generated/prisma/client';
 import { prismaTest } from 'jest.setup';
 
 const prisma = prismaTest;
