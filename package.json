@@ -8,6 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --fix",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:db:migrate": "tsx scripts/migrate-test.ts",
     "migrate:dev": "prisma migrate dev",
     "seed": "tsx src/database/seed.ts",
     "populate": "tsx src/database/populate.ts"
