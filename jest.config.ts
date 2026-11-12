@@ -3,7 +3,7 @@ const { compilerOptions } = require('./tsconfig.json');
 
 // Converte os `paths` do tsconfig em moduleNameMapper (o swc não resolve aliases).
 const moduleNameMapper = Object.fromEntries(
-  Object.entries(compilerOptions.paths || {}).map(([alias, [target]]) => [
+  Object.entries<string[]>(compilerOptions.paths ?? {}).map(([alias, [target]]) => [
     `^${alias.replace('.', '\\.').replace('*', '(.*)')}$`,
     `<rootDir>/${target.replace(/^\.\//, '').replace('*', '$1')}`,
   ]),
