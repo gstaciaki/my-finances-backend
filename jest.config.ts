@@ -11,7 +11,7 @@ const moduleNameMapper = Object.fromEntries(
 
 module.exports = {
   testEnvironment: 'node',
-  setupFiles: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   // swc só transpila; a checagem de tipos fica com o `tsc --noEmit`.
   transform: {
     '^.+\\.ts$': ['@swc/jest', { jsc: { parser: { syntax: 'typescript' }, target: 'es2022' } }],

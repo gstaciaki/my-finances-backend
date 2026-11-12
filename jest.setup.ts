@@ -6,3 +6,7 @@ config();
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL_TEST });
 export const prismaTest = new PrismaClient({ adapter });
+
+afterAll(async () => {
+  await prismaTest.$disconnect();
+});
