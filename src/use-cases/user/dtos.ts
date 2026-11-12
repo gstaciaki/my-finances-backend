@@ -1,5 +1,4 @@
 import { User } from '@src/entities/user.entity';
-import { CPF } from '@src/entities/value-objects/cpf';
 import { Paginated } from '@src/types/paginator';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';
 import { zPassword } from '@src/util/zod/zPassword';
@@ -9,7 +8,6 @@ export type OutputUser = {
   id: string;
   name: string;
   email: string;
-  cpf: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -18,7 +16,6 @@ export const CreateUserSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   email: z.email('Email inválido'),
   password: zPassword(),
-  cpf: z.string().refine(CPF.isValid, 'CPF inválido'),
 });
 
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;

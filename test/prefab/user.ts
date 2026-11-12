@@ -1,5 +1,4 @@
 import { User } from '@src/entities/user.entity';
-import { cpf } from './cpf';
 import { faker } from '@faker-js/faker';
 import { Account } from '@src/entities/account.entity';
 
@@ -8,7 +7,6 @@ type UserInput = {
   name?: string;
   email?: string;
   password?: string;
-  userCpf?: string;
   accounts?: Account[];
 };
 
@@ -21,7 +19,6 @@ export const genUser = ({
   name = faker.person.fullName(),
   email = faker.internet.email(),
   password = genPassword(),
-  userCpf = cpf(),
   accounts,
 }: UserInput = {}): User =>
   new User({
@@ -29,6 +26,5 @@ export const genUser = ({
     name,
     email,
     password,
-    cpf: userCpf,
     accounts,
   });
