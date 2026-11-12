@@ -6,60 +6,61 @@ This system corresponds to the backend of my financial tracking application. It 
 
 - Express.js
 - Prisma
-- Postgresql
+- PostgreSQL
 
-## Running locally with Docker
+## Running locally
 
-### Required tools:
+The Compose file starts **only the database**. The API runs on the host.
 
-```bash
-docker
-docker  compose
-```
+### Required tools
 
-### Set environment variables
+- Node.js, version in `.nvmrc` (`nvm use`)
+- pnpm, version in the `packageManager` field of `package.json` (`corepack enable`)
+- Docker with Docker Compose
 
-```bash
-cp  .env.example  .env
-```
-
-### Up containers
+### Setup
 
 ```bash
-docker  compose  up  -d
-```
-OR
-```
-./run dc up -d
-```
-
-### Run migrations
-
-```
-./run cmd pnpm prisma migrate dev
+cp .env.example .env          # fill in JWT_SECRET with your own value
+pnpm install
+docker compose up -d          # creates the `myfinances` and `myfinances_test` databases
+pnpm prisma migrate deploy    # applies the migrations to the development database
+pnpm dev                      # API on http://localhost:3000
 ```
 
-### Checking API
-
-```
-curl --location 'http://localhost:3000/health'
-```
-
-
-### Running Tests
-
-#### Unit Tests:
+The test database is created by `docker/init-test-db.sql`, which Postgres only runs
+when the volume is empty. If you already have a volume, recreate it
+(`docker compose down -v`) or run:
 
 ```bash
-
-./run cmd pnpm test
-
+docker compose exec db psql -U myfinances_user -d myfinances -c "CREATE DATABASE myfinances_test;"
 ```
 
-  
-
-#### Code Quality
+### Checking the API
 
 ```bash
-./run cmd pnpm eslint
+curl http://localhost:3000/health
+```
+
+## Tests
+
+With `NODE_ENV=test` the API uses `DATABASE_URL_TEST`, and the database cleanup
+refuses any database whose name does not end with `_test`.
+
+```bash
+pnpm test:db:migrate   # applies the migrations to the test database
+pnpm test              # unit tests and e2e (supertest)
+```
+
+## Seeds (development only)
+
+```bash
+pnpm seed       # wipes the development database and creates admin@example.com
+pnpm populate   # adds 50 fake users
+```
+
+## Code quality
+
+```bash
+pnpm lint
 ```
