@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { prisma } from '..';
+import { prismaRaw as prisma } from '..';
 import PasswordUtil from '@src/util/password';
 
 export async function populateUsers() {

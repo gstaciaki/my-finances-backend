@@ -12,3 +12,9 @@ export class NotFoundError extends BaseBusinessError {
     super(`Não foi encontrado(a) ${entity} com ${field}: ${value}.`);
   }
 }
+
+export class ForbiddenOperationError extends BaseBusinessError {
+  constructor() {
+    super('Forbidden Access');
+  }
+}

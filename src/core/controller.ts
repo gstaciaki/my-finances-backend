@@ -1,4 +1,8 @@
-import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import {
+  AlreadyExistsError,
+  ForbiddenOperationError,
+  NotFoundError,
+} from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { EmailOrPasswordWrongError, InvalidRefreshTokenError } from '@src/errors/login.errors';
 import { Right, Wrong } from '@src/util/either';
@@ -25,6 +29,10 @@ export abstract class AbstractController<L extends Error, A> {
 
   protected unauthorized(req: Request, res: Response, resultOrError: Wrong<L, A> | L): L {
     return this.sendError(req, res, StatusCodes.UNAUTHORIZED, resultOrError);
+  }
+
+  protected forbidden(req: Request, res: Response, resultOrError: Wrong<L, A> | L): L {
+    return this.sendError(req, res, StatusCodes.FORBIDDEN, resultOrError);
   }
 
   protected notFound(req: Request, res: Response, resultOrError: Wrong<L, A> | L): L {
@@ -91,6 +99,7 @@ export abstract class AbstractController<L extends Error, A> {
       [AlreadyExistsError, this.conflict.bind(this)],
       [EmailOrPasswordWrongError, this.unauthorized.bind(this)],
       [InvalidRefreshTokenError, this.unauthorized.bind(this)],
+      [ForbiddenOperationError, this.forbidden.bind(this)],
     ]);
   }
 
