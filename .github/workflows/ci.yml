@@ -40,7 +40,6 @@ jobs:
       - name: Setup pnpm
         uses: actions/pnpm-setup@v1
         with:
-          version: 12
           runtime: node@26
           cache: true
 
@@ -75,6 +74,12 @@ jobs:
 
       - name: Create .env
         run: cp .env.example .env
+
+      - name: Setup pnpm
+        uses: actions/pnpm-setup@v1
+        with:
+          runtime: node@26
+          cache: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
