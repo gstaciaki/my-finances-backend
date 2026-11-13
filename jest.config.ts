@@ -1,4 +1,7 @@
 /** @type {import('jest').Config} */
+// O Jest carrega esta config como CommonJS: um `import` do JSON não expõe `compilerOptions`
+// e exige `module` esnext/nodenext no tsconfig, então o `require` é intencional.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { compilerOptions } = require('./tsconfig.json');
 
 // Converte os `paths` do tsconfig em moduleNameMapper (o swc não resolve aliases).

@@ -5,9 +5,13 @@ export function expectRight<L, R>(result: Either<L, R>): R {
     return result.value;
   }
 
-  const error = result.value as any;
+  const error = result.value;
   const message =
-    typeof error === 'object' && 'message' in error ? error.message : JSON.stringify(error);
+    error !== null
+      ? typeof error === 'object' && 'message' in error
+        ? error.message
+        : JSON.stringify(error)
+      : 'Unexpected error';
 
   throw new Error(`[Expected Right] Received Left: ${message}`);
 }

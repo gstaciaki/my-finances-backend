@@ -6,8 +6,8 @@
   "packageManager": "pnpm@12.18.0",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint src --fix",
-    "lint:check": "eslint src",
+    "lint": "eslint --fix",
+    "lint:check": "eslint",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "test:db:migrate": "tsx scripts/migrate-test.ts",
     "migrate:dev": "prisma migrate dev",
