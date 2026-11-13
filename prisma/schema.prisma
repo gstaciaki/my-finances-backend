@@ -13,6 +13,32 @@ datasource db {
   provider = "postgresql"
 }
 
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  at        DateTime @default(now())
+  actorId   String
+  model     String
+  recordId  String
+  operation String
+  before    Json
+  after     Json
+
+  @@index([at])
+  @@index([model, recordId])
+}
+
+model RequestLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  at         DateTime @default(now())
+  method     String
+  route      String
+  status     Int
+  durationMs Int
+  actorId    String
+
+  @@index([at])
+}
+
 model User {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
