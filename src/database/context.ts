@@ -14,10 +14,10 @@ export const SYSTEM: Actor = {
   userId: 'system',
 };
 
-export const contextStorage = new AsyncLocalStorage<RequestContext>();
+export const als = new AsyncLocalStorage<RequestContext>();
 
 export function getContext(): RequestContext {
-  return contextStorage.getStore() ?? {};
+  return als.getStore() ?? {};
 }
 
 export function getActor(): Actor | undefined {

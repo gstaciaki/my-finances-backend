@@ -14,7 +14,7 @@ export class NotFoundError extends BaseBusinessError {
 }
 
 export class ForbiddenOperationError extends BaseBusinessError {
-  constructor() {
-    super('Forbidden Access');
+  constructor(message: string) {
+    super(`Forbidden Operation: ${message}`);
   }
 }

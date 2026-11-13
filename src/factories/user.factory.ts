@@ -1,5 +1,5 @@
 import { UserController } from '@src/controllers/user/user.controller';
-import { prisma } from '@src/database';
+import { prisma } from '@src/database/raw';
 import { UserRepository } from '@src/repositories/user/user.repository';
 import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
