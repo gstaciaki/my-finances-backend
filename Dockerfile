@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1
 
-# Informe a mesma versão do pnpm usada localmente (`pnpm --version`):
-#   docker build --build-arg PNPM_VERSION=<versão> .
 ARG NODE_VERSION=26
 
 # ---------- Stage 1: instala dependências e gera o Prisma Client ----------
@@ -22,7 +20,7 @@ COPY . .
 
 # O prisma.config.ts exige DATABASE_URL via env(); o generate não conecta no
 # banco, então um valor fictício basta apenas neste passo.
-RUN NODE_TLS_REJECT_UNAUTHORIZED=0 DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm prisma generate
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm prisma generate
 
 # ---------- Stage 2: imagem final de produção ----------
 FROM node:${NODE_VERSION}-alpine AS production
