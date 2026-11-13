@@ -1,4 +1,4 @@
-import { Account, PrismaClient } from '@prisma/client';
+import { Account, PrismaClient } from '@src/generated/prisma/client';
 import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 // eslint-disable-next-line

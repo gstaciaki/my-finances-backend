@@ -4,7 +4,6 @@ import PasswordUtil from '@src/util/password';
 import { User } from '@src/entities/user.entity';
 import { CreateUserUseCase } from './create-user.usecase';
 import { genUser } from 'test/prefab/user';
-import { cpf } from 'test/prefab/cpf';
 import { InputValidationError } from '@src/errors/input-validation.error';
 
 describe('CreateUserUseCase', () => {
@@ -30,7 +29,6 @@ describe('CreateUserUseCase', () => {
       email: 'test@example.com',
       password: 'Password123!',
       name: 'Teste',
-      cpf: cpf(),
     };
 
     userRepo.findByEmail.mockResolvedValue(genUser());
@@ -47,7 +45,6 @@ describe('CreateUserUseCase', () => {
       email: 'test@example.com',
       password: 'weakPassword',
       name: 'Teste',
-      cpf: cpf(),
     };
 
     const result = await useCase.run(input);
@@ -62,22 +59,6 @@ describe('CreateUserUseCase', () => {
       email: 'invalid',
       password: 'Password123!',
       name: 'Teste',
-      cpf: cpf(),
-    };
-
-    const result = await useCase.run(input);
-
-    expect(result.isWrong()).toBe(true);
-    expect(result.value).toBeInstanceOf(InputValidationError);
-    expect(userRepo.create).not.toHaveBeenCalled();
-  });
-
-  it('should return InputValidationError if cpf is invalid', async () => {
-    const input = {
-      email: 'invalid',
-      password: 'Password123!',
-      name: 'Teste',
-      cpf: '00000000000',
     };
 
     const result = await useCase.run(input);
@@ -92,7 +73,6 @@ describe('CreateUserUseCase', () => {
       email: 'invalid',
       password: 'Password123!',
       name: '',
-      cpf: '00000000000',
     };
 
     const result = await useCase.run(input);
@@ -107,7 +87,6 @@ describe('CreateUserUseCase', () => {
       email: 'newuser@example.com',
       password: 'Password123!',
       name: 'Novo Usuário',
-      cpf: cpf(),
     };
 
     userRepo.findByEmail.mockResolvedValue(null);

@@ -1,19 +1,11 @@
 import { populateUsers } from './populates/user.populate';
-import { populateAccounts } from './populates/account.populate';
-import { populateUserAccounts } from './populates/user-account.populate';
-import { populateTransactions } from './populates/transaction.populate';
 
+// As populates de Conta, Vínculo e Movimentação voltam nas histórias que
+// recriarem essas tabelas (ficam em ./populates, fora da compilação).
 async function main() {
   console.log('Starting populate script...');
 
-  const userIds = await populateUsers();
-
-  const accounts = await populateAccounts();
-  const accountIds = accounts.map(account => account.id);
-
-  await populateUserAccounts(userIds, accountIds);
-
-  await populateTransactions(accountIds);
+  await populateUsers();
 
   console.log('Populate script completed successfully!');
 }

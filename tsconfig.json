@@ -6,11 +6,35 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "baseUrl": "./",
+    "types": ["node", "jest"],
     "paths": {
-      "@src/*": ["src/*"],
-      "test/*": ["test/*"],
-      "jest.setup": ["jest.setup.ts"]
+      "@src/*": ["./src/*"],
+      "test/*": ["./test/*"],
+      "jest.setup": ["./jest.setup.ts"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/controllers/account",
+    "src/controllers/transaction",
+    "src/use-cases/account",
+    "src/use-cases/transaction",
+    "src/repositories/account",
+    "src/repositories/transaction",
+    "src/repositories/user-account",
+    "src/factories/account.factory.ts",
+    "src/factories/transaction.factory.ts",
+    "src/queries/account",
+    "src/routes/account.routes.ts",
+    "src/routes/transaction.routes.ts",
+    "src/entities/account.entity.ts",
+    "src/entities/transaction.entity.ts",
+    "src/types/account.ts",
+    "test/prefab/account.ts",
+    "test/prefab/transaction.ts",
+    "src/database/populates/account.populate.ts",
+    "src/database/populates/transaction.populate.ts",
+    "src/database/populates/user-account.populate.ts"
+  ]
 }

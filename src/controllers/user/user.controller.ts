@@ -30,7 +30,7 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   }
 
   async show(req: Request, res: Response) {
-    const userId = req.params.id;
+    const userId = req.params.id as string;
     const result = await this.showUserUseCase.run({ id: userId });
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
@@ -41,7 +41,7 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   }
 
   async update(req: Request, res: Response) {
-    const userId = req.params.id;
+    const userId = req.params.id as string;
     const result = await this.updateUserUseCase.run({
       id: userId,
       ...req.body,
@@ -50,7 +50,7 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   }
 
   async delete(req: Request, res: Response) {
-    const userId = req.params.id;
+    const userId = req.params.id as string;
     const result = await this.deleteUserUseCase.run({ id: userId });
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }

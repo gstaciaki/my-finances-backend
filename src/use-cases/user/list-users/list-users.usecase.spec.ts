@@ -59,7 +59,6 @@ describe('ListUsersUseCase', () => {
       expect(userOutput).toHaveProperty('id');
       expect(userOutput).toHaveProperty('name');
       expect(userOutput).toHaveProperty('email');
-      expect(userOutput).toHaveProperty('cpf');
       expect(userOutput).toHaveProperty('createdAt');
       expect(userOutput).toHaveProperty('updatedAt');
     });

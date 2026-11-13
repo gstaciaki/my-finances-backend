@@ -5,13 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -19,40 +18,6 @@ model User {
   name      String
   email     String   @unique
   password  String
-  cpf       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  accounts  UserAccount[]
-}
-
-model Account {
-  id           String          @id @default(uuid()) @db.Uuid
-  name         String
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-
-  users        UserAccount[]
-  Transaction Transaction[]
-}
-
-model UserAccount {
-  userId    String  @db.Uuid
-  accountId String  @db.Uuid
-
-  user      User    @relation(fields: [userId], references: [id])
-  account   Account @relation(fields: [accountId], references: [id])
-
-  @@id([userId, accountId])
-}
-
-model Transaction {
-  id          String   @id @default(uuid()) @db.Uuid
-  accountId   String   @db.Uuid
-  description String?
-  amount      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  account     Account  @relation(fields: [accountId], references: [id])
 }

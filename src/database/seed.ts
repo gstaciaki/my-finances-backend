@@ -1,5 +1,6 @@
 import * as readline from 'readline';
-import { cleanDatabase } from 'test/helpers/base-test';
+import { env } from '@src/config/env';
+import { truncateAllTables } from './truncate';
 import { usersSeed } from './seeds/user.seed';
 import { prisma } from '.';
 
@@ -18,6 +19,10 @@ function askConfirmation(question: string): Promise<boolean> {
 }
 
 async function main() {
+  if (env.NODE_ENV === 'production') {
+    throw new Error('O seed de desenvolvimento não roda em produção.');
+  }
+
   console.log('ATTENTION: this operation will purge all data on database');
 
   const confirmed = await askConfirmation('Are you sure? (y/N): ');
@@ -27,7 +32,7 @@ async function main() {
   }
 
   console.log('Cleaning database...');
-  await cleanDatabase(prisma);
+  await truncateAllTables(prisma);
 
   console.log('Starting seeds...');
   await usersSeed();

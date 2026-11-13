@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@src/generated/prisma/client';
+import { truncateAllTables } from '@src/database/truncate';
 import { prismaTest } from 'jest.setup';
 
 const prisma = prismaTest;
@@ -9,17 +10,17 @@ export function setupDatabaseLifecycle() {
   });
 }
 
-export async function cleanDatabase(prisma: PrismaClient) {
-  const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
-      SELECT tablename FROM pg_tables WHERE schemaname='public'
-    `;
+export async function assertTestDatabase(prisma: PrismaClient) {
+  const [row] = await prisma.$queryRaw<Array<{ current_database: string }>>`
+    SELECT current_database()
+  `;
 
-  const tableNames = tables
-    .filter(t => t.tablename !== '_prisma_migrations')
-    .map(t => `"${t.tablename}"`)
-    .join(', ');
-
-  if (tableNames) {
-    await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`);
+  if (!row?.current_database.endsWith('_test')) {
+    throw new Error(`Limpeza recusada: o banco "${row?.current_database}" não termina em "_test".`);
   }
+}
+
+export async function cleanDatabase(prisma: PrismaClient) {
+  await assertTestDatabase(prisma);
+  await truncateAllTables(prisma);
 }
