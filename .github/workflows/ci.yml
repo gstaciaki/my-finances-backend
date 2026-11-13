@@ -38,15 +38,14 @@ jobs:
         run: cp .env.example .env
 
       - name: Setup pnpm
-        uses: actions/pnpm-setup@v1
+        uses: pnpm/setup@v1
         with:
-          runtime: node@26
           cache: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 26
+          node-version-file: .nvmrc.
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -57,7 +56,7 @@ jobs:
       - name: Run migrations
         env:
           DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
-        run: pnpm prisma migrate deploy
+        run: pnpm test:db:migrate
 
       - name: Run tests
         env:
@@ -76,18 +75,17 @@ jobs:
         run: cp .env.example .env
 
       - name: Setup pnpm
-        uses: actions/pnpm-setup@v1
+        uses: pnpm/setup@v1
         with:
-          runtime: node@26
           cache: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 26
+          node-version-file: .nvmrc.
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: pnpm lint
+        run: pnpm lint:check
