@@ -58,6 +58,9 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
         run: pnpm test:db:migrate
 
+      - name: Check for Type errors
+        run: pnpm tsc --noEmit
+
       - name: Run tests
         env:
           DATABASE_URL: ${{ env.DATABASE_URL_TEST }}
