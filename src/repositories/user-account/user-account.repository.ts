@@ -1,4 +1,5 @@
-import { PrismaClient, UserAccount } from '@src/generated/prisma/client';
+import { UserAccount } from '@src/generated/prisma/client';
+import { DbClient } from '@src/database';
 import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 // eslint-disable-next-line
@@ -8,9 +9,9 @@ export class UserAccountRepository
   extends BaseRepository<UserAccount>
   implements IUserAccountRepository
 {
-  protected model: PrismaClient['userAccount'];
+  protected model: DbClient['userAccount'];
 
-  constructor(prismaClient: PrismaClient) {
+  constructor(prismaClient: DbClient) {
     super(prismaClient);
     this.model = prismaClient.userAccount;
   }

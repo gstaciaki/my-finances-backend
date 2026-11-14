@@ -2,7 +2,7 @@ import * as readline from 'readline';
 import { env } from '@src/config/env';
 import { truncateAllTables } from './truncate';
 import { usersSeed } from './seeds/user.seed';
-import { prisma } from '.';
+import { prismaRaw as prisma } from './raw';
 
 function askConfirmation(question: string): Promise<boolean> {
   const rl = readline.createInterface({

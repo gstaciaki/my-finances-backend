@@ -1,6 +1,9 @@
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@src/generated/prisma/client';
-import { env } from '@src/config/env';
+import { prisma } from './extension';
 
-const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
-export const prisma = new PrismaClient({ adapter });
+type App = typeof prisma;
+type TxExt = Parameters<Parameters<App['$transaction']>[0]>[0];
+
+export type DbClient = App | TxExt;
+
+export { prismaRaw } from './raw';
+export { prisma } from './extension';

@@ -7,6 +7,7 @@ import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.u
 import { DeleteUserUseCase } from '@src/use-cases/user/delete-user/delete-user.usecase';
 import { DefaultFailOutput } from '@src/types/errors';
 import { ListUsersInput, UserControllerOutput } from '@src/use-cases/user/dtos';
+import { actorFromRequest } from '@src/util/actor';
 import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 
 type FailOutput = DefaultFailOutput;
@@ -36,27 +37,30 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
   }
 
   async create(req: Request, res: Response) {
-    const result = await this.createUserUseCase.run(req.body);
+    const result = await this.createUserUseCase.run(req.body, actorFromRequest(req));
     return result.isRight() ? this.created(req, res, result) : this.handleError(req, res, result);
   }
 
   async update(req: Request, res: Response) {
     const userId = req.params.id as string;
-    const result = await this.updateUserUseCase.run({
-      id: userId,
-      ...req.body,
-    });
+    const result = await this.updateUserUseCase.run(
+      {
+        id: userId,
+        ...req.body,
+      },
+      actorFromRequest(req),
+    );
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
   async delete(req: Request, res: Response) {
     const userId = req.params.id as string;
-    const result = await this.deleteUserUseCase.run({ id: userId });
+    const result = await this.deleteUserUseCase.run({ id: userId }, actorFromRequest(req));
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
   async changePassword(req: Request, res: Response) {
-    const result = await this.changeUserPasswordUseCase.run(req.body);
+    const result = await this.changeUserPasswordUseCase.run(req.body, actorFromRequest(req));
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 }

@@ -9,7 +9,14 @@ import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-passw
 import { right, wrong } from '@src/util/either';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { ZodError } from 'zod';
-import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import {
+  AlreadyExistsError,
+  ConflitError,
+  ForbiddenError,
+  NotFoundError,
+  ServiceUnavailableError,
+  TooManyRequestsError,
+} from '@src/errors/generic.errors';
 import { EmailOrPasswordWrongError } from '@src/errors/login.errors';
 
 describe('UserController', () => {
@@ -18,6 +25,10 @@ describe('UserController', () => {
   let mockRes: Partial<Response>;
   let jsonMock: jest.Mock;
   let statusMock: jest.Mock;
+
+  // O authMiddleware coloca `user` na requisição; o controller monta o Actor a partir dele.
+  const authUser = { id: 'actor-id', admin: false };
+  const actor = { userId: authUser.id };
 
   const mockUser = {
     id: '123',
@@ -35,6 +46,10 @@ describe('UserController', () => {
   const changeUserPasswordUseCase = { run: jest.fn() } as unknown as ChangeUserPasswordUseCase;
 
   beforeEach(() => {
+    // Os mocks são compartilhados entre os testes: sem limpar, um toHaveBeenCalledWith
+    // poderia passar por causa da chamada de outro teste. (clearAllMocks mantém as implementações.)
+    jest.clearAllMocks();
+
     controller = new UserController(
       createUserUseCase,
       listUsersUseCase,
@@ -58,9 +73,12 @@ describe('UserController', () => {
   });
 
   it('should return 201 if create user runs successfully', async () => {
-    await controller.create(mockReq as Request, mockRes as Response);
+    const req = { ...mockReq, user: authUser } as unknown as Request;
+
+    await controller.create(req, mockRes as Response);
 
     expect(statusMock).toHaveBeenCalledWith(201);
+    expect(createUserUseCase.run).toHaveBeenCalledWith(mockUser, actor);
   });
 
   it('should return 200 if show user runs successfully', async () => {
@@ -75,12 +93,13 @@ describe('UserController', () => {
     await controller.show(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(showUserUseCase.run).toHaveBeenCalledWith({ id: '123' });
   });
 
   it('should return 200 if list users runs successfully', async () => {
     (listUsersUseCase.run as jest.Mock).mockResolvedValue(right([mockUser]));
 
-    const req = {} as unknown as Request;
+    const req = { query: { page: '1', limit: '10' } } as unknown as Request;
     const res = {
       status: jest.fn().mockReturnValue({ send: jest.fn() }),
       send: jest.fn(),
@@ -89,12 +108,17 @@ describe('UserController', () => {
     await controller.index(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(listUsersUseCase.run).toHaveBeenCalledWith(req.query);
   });
 
   it('should return 200 if update user runs successfully', async () => {
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(right(mockUser));
 
-    const req = { params: { id: '123' } } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: { name: 'Novo Nome' },
+      user: authUser,
+    } as unknown as Request;
     const res = {
       status: jest.fn().mockReturnValue({ send: jest.fn() }),
       send: jest.fn(),
@@ -103,12 +127,13 @@ describe('UserController', () => {
     await controller.update(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(updateUserUseCase.run).toHaveBeenCalledWith({ id: '123', name: 'Novo Nome' }, actor);
   });
 
   it('should return 200 if delete user runs successfully', async () => {
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(right(mockUser));
 
-    const req = { params: { id: '123' } } as unknown as Request;
+    const req = { params: { id: '123' }, user: authUser } as unknown as Request;
     const res = {
       status: jest.fn().mockReturnValue({ send: jest.fn() }),
       send: jest.fn(),
@@ -117,6 +142,7 @@ describe('UserController', () => {
     await controller.delete(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(deleteUserUseCase.run).toHaveBeenCalledWith({ id: '123' }, actor);
   });
 
   it('should return 200 if change password runs successfully', async () => {
@@ -129,6 +155,7 @@ describe('UserController', () => {
         currentPassword: 'OldPass123!',
         newPassword: 'NewPass123!',
       },
+      user: authUser,
     } as unknown as Request;
     const res = {
       status: jest.fn().mockReturnValue({ send: jest.fn() }),
@@ -138,6 +165,7 @@ describe('UserController', () => {
     await controller.changePassword(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(changeUserPasswordUseCase.run).toHaveBeenCalledWith(req.body, actor);
   });
 
   it.each([
@@ -157,7 +185,11 @@ describe('UserController', () => {
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (changeUserPasswordUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: authUser,
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;
@@ -178,7 +210,11 @@ describe('UserController', () => {
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: authUser,
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;
@@ -197,7 +233,11 @@ describe('UserController', () => {
     (createUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: authUser,
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;
@@ -218,6 +258,7 @@ describe('UserController', () => {
         currentPassword: 'WrongPass123!',
         newPassword: 'NewPass123!',
       },
+      user: authUser,
     } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
@@ -226,5 +267,42 @@ describe('UserController', () => {
     await controller.changePassword(req, res);
 
     expect(statusMock).toHaveBeenCalledWith(401);
+  });
+
+  it.each([
+    ['ConflitError', new ConflitError('conflito'), 409],
+    ['ServiceUnavailableError', new ServiceUnavailableError('indisponível'), 503],
+    ['ForbiddenError', new ForbiddenError(), 403],
+    ['TooManyRequestsError', new TooManyRequestsError('muitas requisições'), 429],
+    ['NotFoundError without entity (Prisma P2025)', new NotFoundError(), 404],
+  ])('should map %s to %i with the { code, error, slug } body', async (_, error, status) => {
+    (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
+
+    const req = { params: { id: '123' }, body: {}, user: authUser } as unknown as Request;
+    const sendMock = jest.fn();
+    const statusMock = jest.fn().mockReturnValue({ send: sendMock });
+    const res = { status: statusMock, send: sendMock } as unknown as Response;
+
+    await controller.update(req, res);
+
+    expect(statusMock).toHaveBeenCalledWith(status);
+    expect(sendMock).toHaveBeenCalledWith({
+      code: status,
+      error: error.message,
+      slug: error.name,
+    });
+  });
+
+  it('should answer 500 for an error that is not in the error map', async () => {
+    (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(new Error('inesperado')));
+
+    const req = { params: { id: '123' }, user: authUser } as unknown as Request;
+    const sendMock = jest.fn();
+    const statusMock = jest.fn().mockReturnValue({ send: sendMock });
+    const res = { status: statusMock, send: sendMock } as unknown as Response;
+
+    await controller.delete(req, res);
+
+    expect(statusMock).toHaveBeenCalledWith(500);
   });
 });

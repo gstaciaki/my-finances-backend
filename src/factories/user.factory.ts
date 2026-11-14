@@ -1,5 +1,6 @@
 import { UserController } from '@src/controllers/user/user.controller';
 import { prisma } from '@src/database';
+import { UnitOfWork } from '@src/database/unit-of-work';
 import { UserRepository } from '@src/repositories/user/user.repository';
 import { ChangeUserPasswordUseCase } from '@src/use-cases/user/change-user-password/change-user-password.usecase';
 import { CreateUserUseCase } from '@src/use-cases/user/create-user/create-user.usecase';
@@ -10,12 +11,13 @@ import { UpdateUserUseCase } from '@src/use-cases/user/update-user/update-user.u
 
 export function makeUserController(): UserController {
   const userRepository = new UserRepository(prisma);
-  const createUserUseCase = new CreateUserUseCase(userRepository);
+  const unitOfWork = new UnitOfWork();
+  const createUserUseCase = new CreateUserUseCase(unitOfWork);
   const listUsersUseCase = new ListUsersUseCase(userRepository);
   const showUserUseCase = new ShowUserUseCase(userRepository);
-  const updateUserUseCase = new UpdateUserUseCase(userRepository);
-  const deleteUserUseCase = new DeleteUserUseCase(userRepository);
-  const changeUserPasswordUseCase = new ChangeUserPasswordUseCase(userRepository);
+  const updateUserUseCase = new UpdateUserUseCase(unitOfWork);
+  const deleteUserUseCase = new DeleteUserUseCase(unitOfWork);
+  const changeUserPasswordUseCase = new ChangeUserPasswordUseCase(unitOfWork);
 
   return new UserController(
     createUserUseCase,

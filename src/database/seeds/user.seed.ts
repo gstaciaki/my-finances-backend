@@ -1,4 +1,4 @@
-import { prisma } from '..';
+import { prismaRaw as prisma } from '../raw';
 import PasswordUtil from '@src/util/password';
 
 export async function usersSeed() {
