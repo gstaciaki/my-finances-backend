@@ -1,4 +1,5 @@
-import { Prisma, PrismaClient, Transaction } from '@src/generated/prisma/client';
+import { Prisma, Transaction } from '@src/generated/prisma/client';
+import { DbClient } from '@src/database';
 import { BaseRepository, IBaseRepository } from '../../core/repository';
 
 type TransactionWithAccount = Prisma.TransactionGetPayload<{
@@ -13,9 +14,9 @@ export class TransactionRepository
   extends BaseRepository<Transaction>
   implements ITransacationRepository
 {
-  protected model: PrismaClient['transaction'];
+  protected model: DbClient['transaction'];
 
-  constructor(prismaClient: PrismaClient) {
+  constructor(prismaClient: DbClient) {
     super(prismaClient);
     this.model = prismaClient.transaction;
   }
