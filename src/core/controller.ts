@@ -1,4 +1,11 @@
-import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
+import {
+  AlreadyExistsError,
+  ConflitError,
+  ForbiddenError,
+  NotFoundError,
+  ServiceUnavailableError,
+  TooManyRequestsError,
+} from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { EmailOrPasswordWrongError, InvalidRefreshTokenError } from '@src/errors/login.errors';
 import { Right, Wrong } from '@src/util/either';
@@ -91,10 +98,14 @@ export abstract class AbstractController<L extends Error, A> {
     // eslint-disable-next-line
     return new Map<Function, Handler>([
       [InputValidationError, this.badRequest.bind(this)],
-      [NotFoundError, this.notFound.bind(this)],
-      [AlreadyExistsError, this.conflict.bind(this)],
       [EmailOrPasswordWrongError, this.unauthorized.bind(this)],
       [InvalidRefreshTokenError, this.unauthorized.bind(this)],
+      [NotFoundError, this.notFound.bind(this)],
+      [ForbiddenError, this.forbidden.bind(this)],
+      [AlreadyExistsError, this.conflict.bind(this)],
+      [ConflitError, this.conflict.bind(this)],
+      [TooManyRequestsError, this.tooManyRequests.bind(this)],
+      [ServiceUnavailableError, this.serviceUnavailable.bind(this)],
     ]);
   }
 

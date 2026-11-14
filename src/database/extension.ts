@@ -1,4 +1,4 @@
-import { ForbiddenOperationError } from '@src/errors/generic.errors';
+import { ForbiddenOperationError } from '@src/errors/forbidden-operation.error';
 import { prismaRaw } from './raw';
 import { getContext } from './context';
 import { Prisma } from '@src/generated/prisma/client';

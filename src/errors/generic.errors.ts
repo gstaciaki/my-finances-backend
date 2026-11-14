@@ -8,13 +8,38 @@ export class AlreadyExistsError extends BaseBusinessError {
 }
 
 export class NotFoundError extends BaseBusinessError {
-  constructor(entity: string, field: string = 'id', value: string) {
-    super(`Não foi encontrado(a) ${entity} com ${field}: ${value}.`);
+  constructor();
+  constructor(entity: string, field: string, value: string);
+
+  constructor(entity?: string, field?: string, value?: string) {
+    super(
+      entity
+        ? `Não foi encontrado(a) ${entity} com ${field}: ${value}.`
+        : 'Registro não encontrado.',
+    );
   }
 }
 
-export class ForbiddenOperationError extends BaseBusinessError {
-  constructor(message: string) {
-    super(`Forbidden Operation: ${message}`);
+export class ForbiddenError extends BaseBusinessError {
+  constructor() {
+    super('Forbidden acess');
+  }
+}
+
+export class ConflitError extends BaseBusinessError {
+  constructor(message?: string) {
+    super(message);
+  }
+}
+
+export class ServiceUnavailableError extends BaseBusinessError {
+  constructor(message?: string) {
+    super(message);
+  }
+}
+
+export class TooManyRequestsError extends BaseBusinessError {
+  constructor(message?: string) {
+    super(message);
   }
 }

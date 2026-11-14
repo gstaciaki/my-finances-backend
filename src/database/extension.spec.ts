@@ -1,6 +1,6 @@
 import { prisma, prismaRaw } from '@src/database';
 import { als } from '@src/database/context';
-import { ForbiddenOperationError } from '@src/errors/generic.errors';
+import { ForbiddenOperationError } from '@src/errors/forbidden-operation.error';
 import { Prisma } from '@src/generated/prisma/client';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
 import { runAsActor } from 'test/helpers/run-as-actor';

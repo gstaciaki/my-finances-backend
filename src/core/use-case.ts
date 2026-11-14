@@ -1,10 +1,12 @@
 import { InputValidationError } from '@src/errors/input-validation.error';
+import { ServiceUnavailableError } from '@src/errors/generic.errors';
 import { UnknownError } from '@src/errors/unknow.error';
 import { Either, wrong } from '@src/util/either';
+import { translatePrismaError, TranslatedPrismaError } from '@src/util/prisma/translate-error';
 import { ZodType } from 'zod';
 
 export type UseCaseResult<FailOutput extends Error, SuccessOutput> = Either<
-  FailOutput | InputValidationError | UnknownError,
+  FailOutput | InputValidationError | UnknownError | TranslatedPrismaError,
   SuccessOutput
 >;
 
@@ -24,6 +26,12 @@ export abstract class UseCasePipeline<Input, FailOutput extends Error, SuccessOu
 
       return await handler(result.data);
     } catch (error) {
+      const translated = translatePrismaError(error);
+      if (translated) {
+        if (translated instanceof ServiceUnavailableError) console.error(error);
+        return wrong(translated);
+      }
+
       console.error(error);
       return wrong(new UnknownError());
     }
