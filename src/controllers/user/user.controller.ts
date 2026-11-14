@@ -43,21 +43,24 @@ export class UserController extends AbstractController<FailOutput, SuccessOutput
 
   async update(req: Request, res: Response) {
     const userId = req.params.id as string;
-    const result = await this.updateUserUseCase.run({
-      id: userId,
-      ...req.body,
-    });
+    const result = await this.updateUserUseCase.run(
+      {
+        id: userId,
+        ...req.body,
+      },
+      actorFromRequest(req),
+    );
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
   async delete(req: Request, res: Response) {
     const userId = req.params.id as string;
-    const result = await this.deleteUserUseCase.run({ id: userId });
+    const result = await this.deleteUserUseCase.run({ id: userId }, actorFromRequest(req));
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 
   async changePassword(req: Request, res: Response) {
-    const result = await this.changeUserPasswordUseCase.run(req.body);
+    const result = await this.changeUserPasswordUseCase.run(req.body, actorFromRequest(req));
     return result.isRight() ? this.ok(req, res, result) : this.handleError(req, res, result);
   }
 }

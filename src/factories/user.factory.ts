@@ -15,9 +15,9 @@ export function makeUserController(): UserController {
   const createUserUseCase = new CreateUserUseCase(unitOfWork);
   const listUsersUseCase = new ListUsersUseCase(userRepository);
   const showUserUseCase = new ShowUserUseCase(userRepository);
-  const updateUserUseCase = new UpdateUserUseCase(userRepository);
-  const deleteUserUseCase = new DeleteUserUseCase(userRepository);
-  const changeUserPasswordUseCase = new ChangeUserPasswordUseCase(userRepository);
+  const updateUserUseCase = new UpdateUserUseCase(unitOfWork);
+  const deleteUserUseCase = new DeleteUserUseCase(unitOfWork);
+  const changeUserPasswordUseCase = new ChangeUserPasswordUseCase(unitOfWork);
 
   return new UserController(
     createUserUseCase,
