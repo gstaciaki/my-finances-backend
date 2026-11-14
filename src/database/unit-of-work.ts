@@ -5,7 +5,6 @@ import { Either } from '@src/util/either';
 import { Prisma } from '@src/generated/prisma/client';
 import { Rollback } from '@src/errors/rollback.errors';
 
-// Interfaces, não classes: assim o FakeUnitOfWork aceita repositórios falsos.
 export type Repositories = { user: IUserRepository };
 export const createRepositories = (db: DbClient): Repositories => ({
   user: new UserRepository(db),

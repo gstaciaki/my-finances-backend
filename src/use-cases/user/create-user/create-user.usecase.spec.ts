@@ -4,11 +4,16 @@ import PasswordUtil from '@src/util/password';
 import { User } from '@src/entities/user.entity';
 import { CreateUserUseCase } from './create-user.usecase';
 import { genUser } from 'test/prefab/user';
+import { genActor } from 'test/prefab/actor';
+import { FakeUnitOfWork } from 'test/helpers/fake-unit-of-work';
+import { UnknownError } from '@src/errors/unknow.error';
 import { InputValidationError } from '@src/errors/input-validation.error';
 
 describe('CreateUserUseCase', () => {
   let userRepo: jest.Mocked<IUserRepository>;
+  let uow: FakeUnitOfWork;
   let useCase: CreateUserUseCase;
+  const actor = genActor();
 
   beforeEach(() => {
     userRepo = {
@@ -21,7 +26,8 @@ describe('CreateUserUseCase', () => {
       update: jest.fn(),
     };
 
-    useCase = new CreateUserUseCase(userRepo);
+    uow = new FakeUnitOfWork({ user: userRepo });
+    useCase = new CreateUserUseCase(uow);
   });
 
   it('should return AlreadyExistsError if user already exists', async () => {
@@ -33,7 +39,7 @@ describe('CreateUserUseCase', () => {
 
     userRepo.findByEmail.mockResolvedValue(genUser());
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(AlreadyExistsError);
@@ -47,7 +53,7 @@ describe('CreateUserUseCase', () => {
       name: 'Teste',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -61,7 +67,7 @@ describe('CreateUserUseCase', () => {
       name: 'Teste',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -75,7 +81,7 @@ describe('CreateUserUseCase', () => {
       name: '',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -94,7 +100,7 @@ describe('CreateUserUseCase', () => {
 
     jest.spyOn(PasswordUtil, 'hashPassword').mockResolvedValue('hashedPassword');
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     if (result.isWrong()) fail('Expected result to be Right');
     expect(result.value).toBeInstanceOf(User);
@@ -107,5 +113,33 @@ describe('CreateUserUseCase', () => {
         name: input.name,
       }),
     );
+  });
+
+  it('should run the write inside the unit of work with the given actor', async () => {
+    userRepo.findByEmail.mockResolvedValue(null);
+    userRepo.create.mockResolvedValue(genUser());
+
+    await useCase.run({ email: 'a@example.com', password: 'Password123!', name: 'A' }, actor);
+
+    expect(uow.actors).toEqual([actor]);
+  });
+
+  it('should not open the unit of work when the input is invalid', async () => {
+    await useCase.run({ email: 'invalid', password: 'Password123!', name: 'A' }, actor);
+
+    expect(uow.actors).toEqual([]);
+  });
+
+  it('should return UnknownError when the unit of work throws', async () => {
+    userRepo.findByEmail.mockRejectedValue(new Error('db down'));
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const result = await useCase.run(
+      { email: 'a@example.com', password: 'Password123!', name: 'A' },
+      actor,
+    );
+
+    expect(result.isWrong()).toBe(true);
+    expect(result.value).toBeInstanceOf(UnknownError);
   });
 });

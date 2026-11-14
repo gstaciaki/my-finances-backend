@@ -3,32 +3,41 @@ import { UnknownError } from '@src/errors/unknow.error';
 import { Either, wrong } from '@src/util/either';
 import { ZodType } from 'zod';
 
-export abstract class AbstractUseCase<Input, FailOutput extends Error, SuccessOutput> {
-  constructor() {}
+export type UseCaseResult<FailOutput extends Error, SuccessOutput> = Either<
+  FailOutput | InputValidationError | UnknownError,
+  SuccessOutput
+>;
 
-  protected abstract execute(
-    input?: Input,
-  ): Promise<Either<FailOutput | InputValidationError | UnknownError, SuccessOutput>>;
-
+export abstract class UseCasePipeline<Input, FailOutput extends Error, SuccessOutput> {
   protected abstract validationRules(): ZodType<Input>;
 
-  public async run(
+  protected async runPipeline(
     input: Input,
-  ): Promise<Either<FailOutput | InputValidationError | UnknownError, SuccessOutput>> {
+    handler: (parsedInput: Input) => Promise<UseCaseResult<FailOutput, SuccessOutput>>,
+  ): Promise<UseCaseResult<FailOutput, SuccessOutput>> {
     try {
-      const schema = this.validationRules();
-      const result = schema.safeParse(input);
+      const result = this.validationRules().safeParse(input);
 
       if (!result.success) {
         return wrong(new InputValidationError(result.error));
       }
 
-      const parsedInput = result.data;
-      const output = await this.execute(parsedInput);
-      return output;
+      return await handler(result.data);
     } catch (error) {
       console.error(error);
       return wrong(new UnknownError());
     }
+  }
+}
+
+export abstract class AbstractUseCase<
+  Input,
+  FailOutput extends Error,
+  SuccessOutput,
+> extends UseCasePipeline<Input, FailOutput, SuccessOutput> {
+  protected abstract execute(input?: Input): Promise<UseCaseResult<FailOutput, SuccessOutput>>;
+
+  public run(input: Input): Promise<UseCaseResult<FailOutput, SuccessOutput>> {
+    return this.runPipeline(input, parsedInput => this.execute(parsedInput));
   }
 }

@@ -1,13 +1,18 @@
 import { ChangeUserPasswordUseCase } from './change-user-password.usecase';
 import { IUserRepository } from '@src/repositories/user/user.repository';
 import { genUser } from 'test/prefab/user';
+import { genActor } from 'test/prefab/actor';
+import { FakeUnitOfWork } from 'test/helpers/fake-unit-of-work';
+import { UnknownError } from '@src/errors/unknow.error';
 import { EmailOrPasswordWrongError } from '@src/errors/login.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import PasswordUtil from '@src/util/password';
 
 describe('ChangeUserPasswordUseCase', () => {
   let userRepo: jest.Mocked<IUserRepository>;
+  let uow: FakeUnitOfWork;
   let useCase: ChangeUserPasswordUseCase;
+  const actor = genActor();
 
   beforeEach(() => {
     userRepo = {
@@ -20,7 +25,8 @@ describe('ChangeUserPasswordUseCase', () => {
       update: jest.fn(),
     };
 
-    useCase = new ChangeUserPasswordUseCase(userRepo);
+    uow = new FakeUnitOfWork({ user: userRepo });
+    useCase = new ChangeUserPasswordUseCase(uow);
   });
 
   afterEach(() => {
@@ -34,7 +40,7 @@ describe('ChangeUserPasswordUseCase', () => {
       newPassword: 'NewPass123!',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -52,7 +58,7 @@ describe('ChangeUserPasswordUseCase', () => {
     userRepo.findByEmail.mockResolvedValue(existingUser);
     jest.spyOn(PasswordUtil, 'comparePasswords').mockResolvedValue(false);
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(EmailOrPasswordWrongError);
@@ -66,7 +72,7 @@ describe('ChangeUserPasswordUseCase', () => {
       newPassword: 'newpass123!',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -80,7 +86,7 @@ describe('ChangeUserPasswordUseCase', () => {
       newPassword: 'NewPassword!',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -94,7 +100,7 @@ describe('ChangeUserPasswordUseCase', () => {
       newPassword: 'NewPassword123',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -108,7 +114,7 @@ describe('ChangeUserPasswordUseCase', () => {
       newPassword: 'Pass1!',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -124,7 +130,7 @@ describe('ChangeUserPasswordUseCase', () => {
 
     userRepo.findByEmail.mockResolvedValue(null);
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(EmailOrPasswordWrongError);
@@ -143,7 +149,7 @@ describe('ChangeUserPasswordUseCase', () => {
     userRepo.findByEmail.mockResolvedValue(existingUser);
     jest.spyOn(PasswordUtil, 'comparePasswords').mockResolvedValue(false);
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(EmailOrPasswordWrongError);
@@ -168,7 +174,7 @@ describe('ChangeUserPasswordUseCase', () => {
     jest.spyOn(PasswordUtil, 'hashPassword').mockResolvedValue('hashedNewPassword');
     userRepo.update.mockResolvedValue({ ...existingUser, password: 'hashedNewPassword' });
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     if (result.isWrong()) fail('Expected result to be Right');
 
@@ -204,9 +210,44 @@ describe('ChangeUserPasswordUseCase', () => {
       .mockResolvedValue('hashedNewPassword');
     userRepo.update.mockResolvedValue({ ...existingUser, password: 'hashedNewPassword' });
 
-    await useCase.run(input);
+    await useCase.run(input, actor);
 
     expect(hashPasswordSpy).toHaveBeenCalledWith(input.newPassword);
     expect(hashPasswordSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should run inside the unit of work with the given actor', async () => {
+    userRepo.findById.mockResolvedValue(null);
+    userRepo.findByEmail.mockResolvedValue(null);
+
+    await useCase.run(
+      { email: 'user@example.com', currentPassword: 'OldPass123!', newPassword: 'NewPass123!' },
+      actor,
+    );
+
+    expect(uow.actors).toEqual([actor]);
+  });
+
+  it('should not open the unit of work when the input is invalid', async () => {
+    await useCase.run(
+      { email: 'invalid-email', currentPassword: 'OldPass123!', newPassword: 'NewPass123!' },
+      actor,
+    );
+
+    expect(uow.actors).toEqual([]);
+  });
+
+  it('should return UnknownError when the repository throws inside the unit of work', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    userRepo.findById.mockRejectedValue(new Error('db down'));
+    userRepo.findByEmail.mockRejectedValue(new Error('db down'));
+
+    const result = await useCase.run(
+      { email: 'user@example.com', currentPassword: 'OldPass123!', newPassword: 'NewPass123!' },
+      actor,
+    );
+
+    expect(result.isWrong()).toBe(true);
+    expect(result.value).toBeInstanceOf(UnknownError);
   });
 });

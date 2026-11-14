@@ -58,9 +58,12 @@ describe('UserController', () => {
   });
 
   it('should return 201 if create user runs successfully', async () => {
-    await controller.create(mockReq as Request, mockRes as Response);
+    const req = { ...mockReq, user: { id: 'actor-id', admin: false } } as unknown as Request;
+
+    await controller.create(req, mockRes as Response);
 
     expect(statusMock).toHaveBeenCalledWith(201);
+    expect(createUserUseCase.run).toHaveBeenCalledWith(mockUser, { userId: 'actor-id' });
   });
 
   it('should return 200 if show user runs successfully', async () => {
@@ -157,7 +160,11 @@ describe('UserController', () => {
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (changeUserPasswordUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: { id: 'actor-id', admin: false },
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;
@@ -178,7 +185,11 @@ describe('UserController', () => {
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (deleteUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: { id: 'actor-id', admin: false },
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;
@@ -197,7 +208,11 @@ describe('UserController', () => {
     (createUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
     (updateUserUseCase.run as jest.Mock).mockResolvedValue(wrong(error));
 
-    const req = { params: { id: '123' }, body: {} } as unknown as Request;
+    const req = {
+      params: { id: '123' },
+      body: {},
+      user: { id: 'actor-id', admin: false },
+    } as unknown as Request;
     const sendMock = jest.fn();
     const statusMock = jest.fn().mockReturnValue({ send: sendMock });
     const res = { status: statusMock, send: sendMock } as unknown as Response;

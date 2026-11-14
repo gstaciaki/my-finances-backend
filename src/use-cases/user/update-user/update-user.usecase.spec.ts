@@ -1,13 +1,18 @@
 import { UpdateUserUseCase } from './update-user.usecase';
 import { IUserRepository } from '@src/repositories/user/user.repository';
 import { genUser } from 'test/prefab/user';
+import { genActor } from 'test/prefab/actor';
+import { FakeUnitOfWork } from 'test/helpers/fake-unit-of-work';
+import { UnknownError } from '@src/errors/unknow.error';
 import { AlreadyExistsError, NotFoundError } from '@src/errors/generic.errors';
 import { InputValidationError } from '@src/errors/input-validation.error';
 import { User } from '@src/entities/user.entity';
 
 describe('UpdateUserUseCase', () => {
   let userRepo: jest.Mocked<IUserRepository>;
+  let uow: FakeUnitOfWork;
   let useCase: UpdateUserUseCase;
+  const actor = genActor();
 
   beforeEach(() => {
     userRepo = {
@@ -20,7 +25,12 @@ describe('UpdateUserUseCase', () => {
       update: jest.fn(),
     };
 
-    useCase = new UpdateUserUseCase(userRepo);
+    uow = new FakeUnitOfWork({ user: userRepo });
+    useCase = new UpdateUserUseCase(uow);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('should return InputValidationError if id is invalid', async () => {
@@ -30,7 +40,7 @@ describe('UpdateUserUseCase', () => {
       name: 'Updated Name',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -45,7 +55,7 @@ describe('UpdateUserUseCase', () => {
       name: 'Updated Name',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -60,7 +70,7 @@ describe('UpdateUserUseCase', () => {
       name: '',
     };
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InputValidationError);
@@ -77,7 +87,7 @@ describe('UpdateUserUseCase', () => {
 
     userRepo.findById.mockResolvedValue(null);
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(NotFoundError);
@@ -95,7 +105,7 @@ describe('UpdateUserUseCase', () => {
     userRepo.findById.mockResolvedValue(existingUser);
     userRepo.findByEmail.mockResolvedValue(genUser({ email: input.email }));
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(AlreadyExistsError);
@@ -114,7 +124,7 @@ describe('UpdateUserUseCase', () => {
     userRepo.findByEmail.mockResolvedValue(null);
     userRepo.update.mockResolvedValue({ ...existingUser, ...input });
 
-    const result = await useCase.run(input);
+    const result = await useCase.run(input, actor);
 
     if (result.isWrong()) fail('Expected result to be Right');
 
@@ -129,5 +139,37 @@ describe('UpdateUserUseCase', () => {
         name: input.name,
       }),
     );
+  });
+
+  it('should run inside the unit of work with the given actor', async () => {
+    userRepo.findById.mockResolvedValue(null);
+    userRepo.findByEmail.mockResolvedValue(null);
+
+    await useCase.run(
+      { id: 'a08f0dd7-bec7-4c0b-b065-aaa9f7683be6', email: 'new@email.com', name: 'Updated Name' },
+      actor,
+    );
+
+    expect(uow.actors).toEqual([actor]);
+  });
+
+  it('should not open the unit of work when the input is invalid', async () => {
+    await useCase.run({ id: 'invalid-id', email: 'new@email.com', name: 'Updated Name' }, actor);
+
+    expect(uow.actors).toEqual([]);
+  });
+
+  it('should return UnknownError when the repository throws inside the unit of work', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    userRepo.findById.mockRejectedValue(new Error('db down'));
+    userRepo.findByEmail.mockRejectedValue(new Error('db down'));
+
+    const result = await useCase.run(
+      { id: 'a08f0dd7-bec7-4c0b-b065-aaa9f7683be6', email: 'new@email.com', name: 'Updated Name' },
+      actor,
+    );
+
+    expect(result.isWrong()).toBe(true);
+    expect(result.value).toBeInstanceOf(UnknownError);
   });
 });
