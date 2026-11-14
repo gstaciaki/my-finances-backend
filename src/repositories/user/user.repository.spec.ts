@@ -1,3 +1,4 @@
+import { DbClient } from '@src/database';
 import { UserRepository } from './user.repository';
 import { User } from '@src/entities/user.entity';
 import { prismaTest } from 'jest.setup';

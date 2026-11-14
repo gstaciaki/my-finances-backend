@@ -1,7 +1,7 @@
-import { PrismaClient } from '@src/generated/prisma/client';
+import { DbClient } from '@src/database';
 
 export abstract class BaseQuery<Input, Output> {
-  constructor(protected readonly prisma: PrismaClient) {}
+  constructor(protected readonly prisma: DbClient) {}
 
   abstract execute(input: Input): Promise<Output>;
 }

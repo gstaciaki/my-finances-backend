@@ -1,4 +1,4 @@
-import { PrismaClient } from '@src/generated/prisma/client';
+import { DbClient } from '@src/database';
 import { PaginatorParams } from '@src/types/paginator';
 
 export interface IBaseRepository<T> {
@@ -10,12 +10,20 @@ export interface IBaseRepository<T> {
   delete(id: string): Promise<void>;
 }
 
-export abstract class BaseRepository<T> implements IBaseRepository<T> {
-  // eslint-disable-next-line
-  protected abstract model: any;
-  protected prismaClient: PrismaClient;
+interface ModelDelegate<T> {
+  create(args: { data: T }): Promise<T>;
+  findUnique(args: { where: { id: string } }): Promise<T | null>;
+  findMany(args?: { where?: Record<string, unknown>; skip?: number; take?: number }): Promise<T[]>;
+  count(args?: { where?: Record<string, unknown> }): Promise<number>;
+  update(args: { where: { id: string }; data: Partial<T> }): Promise<T>;
+  delete(args: { where: { id: string } }): Promise<unknown>;
+}
 
-  constructor(prismaClient: PrismaClient) {
+export abstract class BaseRepository<T> implements IBaseRepository<T> {
+  protected abstract model: ModelDelegate<T>;
+  protected prismaClient: DbClient;
+
+  constructor(prismaClient: DbClient) {
     this.prismaClient = prismaClient;
   }
 
@@ -35,12 +43,8 @@ export abstract class BaseRepository<T> implements IBaseRepository<T> {
     const { page, limit, filters = {} } = params;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.prismaClient.$transaction([
-      this.model.findMany({
-        where: filters,
-        skip,
-        take: limit,
-      }),
+    const [data, total] = await Promise.all([
+      this.model.findMany({ where: filters, skip, take: limit }),
       this.model.count({ where: filters }),
     ]);
 

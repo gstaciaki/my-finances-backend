@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { app } from '@src/app';
-import { prisma } from '@src/database/raw';
+import { prisma } from '@src/database';
 
 describe('GET /health (e2e)', () => {
   afterAll(async () => {
