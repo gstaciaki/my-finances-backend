@@ -2,8 +2,7 @@ import { app } from '@src/app';
 import { prismaRaw } from '@src/database';
 import request from 'supertest';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
-import { auditRows, bearer, seedUser, SEED_PASSWORD } from 'test/helpers/e2e';
-import { genActor } from 'test/prefab/actor';
+import { auditRows, authenticate, seedUser, SEED_PASSWORD } from 'test/helpers/e2e';
 import { genUser } from 'test/prefab/user';
 
 setupDatabaseLifecycle();
@@ -15,8 +14,16 @@ const errorBody = (code: number) => ({
 });
 
 describe('users API: audit, rollback and errors (e2e)', () => {
-  const actor = genActor();
-  const auth = bearer(actor.userId);
+  // O usuário autenticado e a sessão são criados antes de cada teste (a limpeza do
+  // banco roda antes, em setupDatabaseLifecycle). Eles entram nas contagens de usuário.
+  let actor: { userId: string };
+  let auth: Record<string, string>;
+
+  beforeEach(async () => {
+    const { user, headers } = await authenticate();
+    actor = { userId: user.id };
+    auth = headers;
+  });
 
   describe('writes leave an AuditLog with the token actor', () => {
     it('POST /api/user', async () => {
@@ -74,7 +81,7 @@ describe('users API: audit, rollback and errors (e2e)', () => {
         after: null,
       });
       expect(row.before).toMatchObject({ id: user.id, password: '***' });
-      expect(await prismaRaw.user.count()).toBe(0);
+      expect(await prismaRaw.user.findUnique({ where: { id: user.id } })).toBeNull();
     });
 
     it('POST /api/user/change-password', async () => {
@@ -118,7 +125,7 @@ describe('users API: audit, rollback and errors (e2e)', () => {
         .send({ name: 'Outro', email: existing.email, password: 'Password123!' });
 
       expect(response.status).toBe(409);
-      expect(await prismaRaw.user.count()).toBe(1);
+      expect(await prismaRaw.user.count()).toBe(2); // o autenticado e o existente, nenhum novo
       expect(await auditRows()).toHaveLength(0);
     });
 
@@ -131,7 +138,7 @@ describe('users API: audit, rollback and errors (e2e)', () => {
       ]);
 
       expect(responses.map(r => r.status).sort()).toEqual([201, 409]);
-      expect(await prismaRaw.user.count()).toBe(1);
+      expect(await prismaRaw.user.count({ where: { email: body.email } })).toBe(1);
       expect(await auditRows()).toHaveLength(1);
     });
 
@@ -209,7 +216,7 @@ describe('users API: audit, rollback and errors (e2e)', () => {
         .send({ name: 'X', email: 'x@example.com', password: 'Password123!' });
 
       expect(response.status).toBe(401);
-      expect(await prismaRaw.user.count()).toBe(0);
+      expect(await prismaRaw.user.count({ where: { email: 'x@example.com' } })).toBe(0);
       expect(await auditRows()).toHaveLength(0);
     });
   });

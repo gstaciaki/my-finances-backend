@@ -5,8 +5,7 @@ import { requestLogMiddleware } from '@src/middlewares/request-log.middleware';
 import express, { Router } from 'express';
 import request from 'supertest';
 import { setupDatabaseLifecycle } from 'test/helpers/base-test';
-import { bearer, SEED_PASSWORD, waitForRequestLogs } from 'test/helpers/e2e';
-import { genActor } from 'test/prefab/actor';
+import { authenticate, SEED_PASSWORD, waitForRequestLogs } from 'test/helpers/e2e';
 import { genUser } from 'test/prefab/user';
 
 setupDatabaseLifecycle();
@@ -17,10 +16,10 @@ describe('RequestLog (e2e)', () => {
   });
 
   it('records method, route pattern, status, duration and actor', async () => {
-    const actor = genActor();
+    const { user, headers } = await authenticate();
     const id = genUser().id;
 
-    const response = await request(app).get(`/api/user/${id}`).set(bearer(actor.userId));
+    const response = await request(app).get(`/api/user/${id}`).set(headers);
     expect(response.status).toBe(404);
 
     const [row, ...rest] = await waitForRequestLogs();
@@ -29,15 +28,16 @@ describe('RequestLog (e2e)', () => {
       method: 'GET',
       route: '/api/user/:id',
       status: 404,
-      actorId: actor.userId,
+      actorId: user.id,
     });
     expect(row.durationMs).toBeGreaterThanOrEqual(0);
   });
 
   it('stores the route pattern, never the real id', async () => {
+    const { headers } = await authenticate();
     const id = genUser().id;
 
-    await request(app).get(`/api/user/${id}`).set(bearer(genActor().userId));
+    await request(app).get(`/api/user/${id}`).set(headers);
 
     const [row] = await waitForRequestLogs();
     expect(row.route).not.toContain(id);
@@ -69,7 +69,7 @@ describe('RequestLog (e2e)', () => {
   });
 
   it('does not store body, query string or headers', async () => {
-    const actor = genActor();
+    const { headers } = await authenticate();
     const body = {
       name: 'Nome Secreto',
       email: 'segredo@example.com',
@@ -78,7 +78,7 @@ describe('RequestLog (e2e)', () => {
 
     await request(app)
       .post('/api/user?token=valor-na-query')
-      .set(bearer(actor.userId))
+      .set(headers)
       .set('X-Custom-Secret', 'valor-no-header')
       .send(body);
 

@@ -22,9 +22,9 @@ describe('RefreshTokenUseCase', () => {
       },
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(mockPayload);
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(mockPayload);
     jest
-      .spyOn(JWT, 'signToken')
+      .spyOn(JWT, 'signAccessToken')
       .mockReturnValueOnce('new.access.token')
       .mockReturnValueOnce('new.refresh.token');
 
@@ -36,8 +36,8 @@ describe('RefreshTokenUseCase', () => {
       accessToken: 'new.access.token',
       refreshToken: input.refreshToken,
     });
-    expect(JWT.verifyToken).toHaveBeenCalledWith(input.refreshToken);
-    expect(JWT.signToken).toHaveBeenCalledWith({ userId: mockPayload.user.id });
+    expect(JWT.verifyAccessToken).toHaveBeenCalledWith(input.refreshToken);
+    expect(JWT.signAccessToken).toHaveBeenCalledWith({ userId: mockPayload.user.id });
   });
 
   it('should return InvalidRefreshTokenError if refresh token is invalid', async () => {
@@ -45,13 +45,13 @@ describe('RefreshTokenUseCase', () => {
       refreshToken: 'invalid.refresh.token',
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(null);
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(null);
 
     const result = await useCase.run(input);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InvalidRefreshTokenError);
-    expect(JWT.verifyToken).toHaveBeenCalledWith(input.refreshToken);
+    expect(JWT.verifyAccessToken).toHaveBeenCalledWith(input.refreshToken);
   });
 
   it('should return InvalidRefreshTokenError if refresh token is expired', async () => {
@@ -59,13 +59,13 @@ describe('RefreshTokenUseCase', () => {
       refreshToken: 'expired.refresh.token',
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(null);
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(null);
 
     const result = await useCase.run(input);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InvalidRefreshTokenError);
-    expect(JWT.verifyToken).toHaveBeenCalledWith(input.refreshToken);
+    expect(JWT.verifyAccessToken).toHaveBeenCalledWith(input.refreshToken);
   });
 
   it('should return InvalidRefreshTokenError if token payload is malformed', async () => {
@@ -73,13 +73,13 @@ describe('RefreshTokenUseCase', () => {
       refreshToken: 'malformed.token',
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(null);
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(null);
 
     const result = await useCase.run(input);
 
     expect(result.isWrong()).toBe(true);
     expect(result.value).toBeInstanceOf(InvalidRefreshTokenError);
-    expect(JWT.verifyToken).toHaveBeenCalledWith(input.refreshToken);
+    expect(JWT.verifyAccessToken).toHaveBeenCalledWith(input.refreshToken);
   });
 
   it('should return InvalidRefreshTokenError if refreshToken is empty string', async () => {
@@ -87,7 +87,7 @@ describe('RefreshTokenUseCase', () => {
       refreshToken: '',
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(null);
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(null);
 
     const result = await useCase.run(input);
 
@@ -107,8 +107,8 @@ describe('RefreshTokenUseCase', () => {
       },
     };
 
-    jest.spyOn(JWT, 'verifyToken').mockReturnValue(mockPayload);
-    jest.spyOn(JWT, 'signToken').mockReturnValue('new.access.token');
+    jest.spyOn(JWT, 'verifyAccessToken').mockReturnValue(mockPayload);
+    jest.spyOn(JWT, 'signAccessToken').mockReturnValue('new.access.token');
 
     const result = await useCase.run(input);
 

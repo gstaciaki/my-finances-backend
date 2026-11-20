@@ -1,26 +1,28 @@
 import { env } from '@src/config/env';
 import jwt from 'jsonwebtoken';
+import z from 'zod';
 
 const secret = env.JWT_SECRET;
 
+const AccessToken = z.object({
+  sub: z.string(),
+  sessionId: z.string(),
+});
+
 export default class JWT {
-  public static signToken({
+  public static signAccessToken({
     userId,
-    refresh = false,
-    admin = false,
+    sessionId,
   }: {
     userId: string;
-    refresh?: boolean;
-    admin?: boolean;
+    sessionId: string;
   }): string {
-    return jwt.sign({ user: { id: userId, admin } }, secret, {
-      expiresIn: refresh ? '7d' : '15min',
-    });
+    return jwt.sign({ sub: userId, sessionId }, secret, { expiresIn: '15min' });
   }
 
-  public static verifyToken(token: string): (jwt.JwtPayload | string) | null {
+  public static verifyAccessToken(token: string): (jwt.JwtPayload | string) | null {
     try {
-      return jwt.verify(token, secret);
+      return AccessToken.parse(jwt.verify(token, secret));
     } catch {
       return null;
     }
