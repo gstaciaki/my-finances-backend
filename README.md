@@ -64,3 +64,10 @@ pnpm populate   # adds 50 fake users
 ```bash
 pnpm lint
 ```
+
+## Continuous integration
+
+Every pull request to `main` runs two workflows:
+
+- **Continuos Integrations** (`ci.yml`): type check, tests against a Postgres service and ESLint.
+- **Claude Code Review** (`claude-code-review.yml`): automated review that comments on the PR. It needs the `CLAUDE_CODE_OAUTH_TOKEN` repository secret and skips draft PRs and PRs from forks.
