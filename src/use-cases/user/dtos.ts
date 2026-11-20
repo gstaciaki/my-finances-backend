@@ -1,6 +1,7 @@
 import { User } from '@src/entities/user.entity';
 import { Paginated } from '@src/types/paginator';
 import { BasePaginatorSchema } from '@src/util/zod/paginator';
+import { zEmail } from '@src/util/zod/zEmail';
 import { zPassword } from '@src/util/zod/zPassword';
 import { z } from 'zod';
 
@@ -14,7 +15,7 @@ export type OutputUser = {
 
 export const CreateUserSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
-  email: z.email('Email inválido'),
+  email: zEmail,
   password: zPassword(),
 });
 
@@ -53,7 +54,7 @@ export type ShowUserInput = z.infer<typeof ShowUserSchema>;
 export type ShowUserOutput = User;
 
 export const ChangeUserPasswordSchema = z.object({
-  email: z.email('Email inválido'),
+  email: zEmail,
   currentPassword: z.string(),
   newPassword: zPassword(),
 });

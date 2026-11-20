@@ -12,8 +12,7 @@ export default class PasswordUtil {
 
   public static checkPasswordRules(password: string): string | undefined {
     const minPasswordLength = 8;
-    const validSymbols = ['!', '@', '#', '$', '%', '&', '*', '+', '=', '~', '^', '-', '_'];
-    const symbolsRegex = new RegExp(`[${validSymbols.join()}]`);
+    const symbolsRegex = new RegExp('[^A-Za-z0-9]');
     const numberRegex = /[0-9]/;
     const uppercaseLetterRegex = /[A-Z]/;
     const letterRegex = /[A-Za-z]/;
@@ -37,7 +36,7 @@ export default class PasswordUtil {
     }
 
     if (!symbolsRegex.test(password)) {
-      return `A senha deve possuir ao menos um símbolo. Ex.: ${validSymbols.join(', ')}`;
+      return `A senha deve possuir ao menos um símbolo`;
     }
 
     return;

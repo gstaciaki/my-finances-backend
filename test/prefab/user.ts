@@ -15,7 +15,7 @@ export const genPassword = (): string => {
 export const genUser = ({
   id = faker.string.uuid(),
   name = faker.person.fullName(),
-  email = faker.internet.email(),
+  email = faker.internet.email().trim().toLowerCase(),
   password = genPassword(),
 }: UserInput = {}): User =>
   new User({
